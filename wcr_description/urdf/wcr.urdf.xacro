@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="wcr" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find wcr_description)/urdf/wcr.xacro" />
+  <xacro:include filename="$(find wcr_description)/urdf/wcr.ros2_control.xacro" />
+  <xacro:wcr/>
+  <xacro:wcr_ros2_control name="wcr_ros2_control" />
+  
+</robot>

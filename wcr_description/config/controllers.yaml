@@ -1,0 +1,28 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    position_controller:
+      type: position_controllers/JointGroupPositionController
+
+velocity_controller:
+  ros__parameters:
+    joints:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+
+position_controller:
+  ros__parameters:
+    joints:
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering

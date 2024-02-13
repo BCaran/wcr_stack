@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:property name="length" value="0.225" />
+	<xacro:property name="width" value="0.225" />
+	<xacro:property name="steering_height" value="0.05029" />
+	<xacro:property name="wheel_height" value="-0.035250" />
+	
+	<xacro:macro name="wcr">
+		<material name="gray">
+			<color rgba="0.5 0.5 0.5 1"/>
+		</material>
+		<material name="red">
+			<color rgba="1 0 0 1"/>
+		</material>
+		<material name="green">
+			<color rgba="0 1 0 1"/>
+		</material>
+		<link name="base_link">
+			<visual>
+				<origin rpy="0 ${-pi/2} ${pi}" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/Housing_Electronic.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="gray"/>
+			</visual>
+		</link>
+		<link name="FL_steering_link">
+			<visual>
+				<origin rpy="0 0 ${pi/2}" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/activeWheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="red"/>
+			</visual>
+		</link>
+		<link name="FL_wheel_link">
+			<visual>
+				<origin rpy="0 ${pi/2} 0" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="green"/>
+			</visual>
+		</link>
+		<link name="BL_steering_link">
+			<visual>
+				<origin rpy="0 0 ${pi/2}" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/activeWheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="red"/>
+			</visual>
+		</link>
+		<link name="BL_wheel_link">
+			<visual>
+				<origin rpy="0 ${pi/2} 0" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="green"/>
+			</visual>
+		</link>
+		<link name="BR_steering_link">
+			<visual>
+				<origin rpy="0 0 ${-pi/2}" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/activeWheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="red"/>
+			</visual>
+		</link>
+		<link name="BR_wheel_link">
+			<visual>
+				<origin rpy="0 0 ${pi}" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="green"/>
+			</visual>
+		</link>
+		<link name="FR_steering_link">
+			<visual>
+				<origin rpy="0 0 ${-pi/2}" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/activeWheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="red"/>
+			</visual>
+		</link>
+		<link name="FR_wheel_link">
+			<visual>
+				<origin rpy="0 0 ${pi}" xyz="0 0 0"/>
+				<geometry>
+					<mesh filename="package://wcr_description/meshes/wheel.stl" scale="0.001 0.001 0.001"/>
+				</geometry>
+				<material name="green"/>
+			</visual>
+		</link>
+		<joint name="FL_steering" type="revolute">
+			<axis xyz="0 0 1"/>
+			<limit effort="1000.0" lower="${-pi/2}" upper="${pi/2}" velocity="0.5"/>
+			<origin xyz="${length/2} ${width/2} ${steering_height}"/>
+			<parent link="base_link"/>
+			<child link="FL_steering_link"/>
+		</joint>
+		<joint name="FL_wheel" type="continuous">
+			<axis xyz="0 1 0"/>
+			<limit effort="1000.0" velocity="0.5"/>
+			<origin xyz="0 0 ${wheel_height}"/>
+			<parent link="FL_steering_link"/>
+			<child link="FL_wheel_link"/>
+		</joint>
+		<joint name="BL_steering" type="revolute">
+			<axis xyz="0 0 1"/>
+			<limit effort="1000.0" lower="${-pi/2}" upper="${pi/2}" velocity="0.5"/>
+			<origin xyz="${-length/2} ${width/2} ${steering_height}"/>
+			<parent link="base_link"/>
+			<child link="BL_steering_link"/>
+		</joint>
+		<joint name="BL_wheel" type="continuous">
+			<axis xyz="0 1 0"/>
+			<limit effort="1000.0" velocity="0.5"/>
+			<origin xyz="0 0 ${wheel_height}"/>
+			<parent link="BL_steering_link"/>
+			<child link="BL_wheel_link"/>
+		</joint>
+		<joint name="BR_steering" type="revolute">
+			<axis xyz="0 0 1"/>
+			<limit effort="1000.0" lower="${-pi/2}" upper="${pi/2}" velocity="0.5"/>
+			<origin xyz="${-length/2} ${-width/2} ${steering_height}"/>
+			<parent link="base_link"/>
+			<child link="BR_steering_link"/>
+		</joint>
+		<joint name="BR_wheel" type="continuous">
+			<axis xyz="0 1 0"/>
+			<limit effort="1000.0" velocity="0.5"/>
+			<origin xyz="0 0 ${wheel_height}"/>
+			<parent link="BR_steering_link"/>
+			<child link="BR_wheel_link"/>
+		</joint>
+		<joint name="FR_steering" type="revolute">
+			<axis xyz="0 0 1"/>
+			<limit effort="1000.0" lower="${-pi/2}" upper="${pi/2}" velocity="0.5"/>
+			<origin xyz="${length/2} ${-width/2} ${steering_height}"/>
+			<parent link="base_link"/>
+			<child link="FR_steering_link"/>
+		</joint>
+		<joint name="FR_wheel" type="continuous">
+			<axis xyz="0 1 0"/>
+			<limit effort="1000.0" velocity="0.5"/>
+			<origin xyz="0 0 ${wheel_height}"/>
+			<parent link="FR_steering_link"/>
+			<child link="FR_wheel_link"/>
+		</joint>
+	</xacro:macro>
+</robot>
