@@ -3,6 +3,7 @@ Stack for Wall climbing robot with 4WIS4WID kinematic structure
 
 # Getting started
 ```console
-foo@bar:~$ whoami
-foo
+mkdir -p wcr/src
+cd wcr/src
+git clone
 ```
