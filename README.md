@@ -5,5 +5,7 @@ Stack for Wall climbing robot with 4WIS4WID kinematic structure
 ```
 mkdir -p wcr/src
 cd wcr/src
-git clone
+git clone https://github.com/BCaran/wcr_stack.git -b humble
+cd ..
+colcon build
 ```
