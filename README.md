@@ -10,3 +10,9 @@ cd ..
 rosdep install -i --from-path src --rosdistro humble -y
 colcon build
 ```
+
+# IMPORTANT!
+Before launching Dynamixel hardware interface, permission has to be added to USB port
+```
+sudo usermod -aG dialout <linux_account>
+```
