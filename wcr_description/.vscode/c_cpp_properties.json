@@ -1,0 +1,42 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/branimir/wcr_ws/install/vesc_driver/include/**",
+        "/home/branimir/wcr_ws/install/vesc_ackermann/include/**",
+        "/home/branimir/wcr_ws/install/vesc_msgs/include/**",
+        "/home/branimir/wcr_ws/install/udp_driver/include/**",
+        "/home/branimir/wcr_ws/install/serial_driver/include/**",
+        "/home/branimir/wcr_ws/install/micro_ros_agent/include/**",
+        "/home/branimir/wcr_ws/install/micro_ros_msgs/include/**",
+        "/home/branimir/wcr_ws/install/io_context/include/**",
+        "/home/branimir/wcr_ws/install/four_wheel_steering_controller/include/**",
+        "/home/branimir/wcr_ws/install/dynamixel_hardware/include/**",
+        "/home/branimir/wcr_ws/install/dynamixel_workbench_toolbox/include/**",
+        "/home/branimir/wcr_ws/install/dynamixel_workbench_msgs/include/**",
+        "/home/branimir/wcr_ws/install/diff_drive_controller/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/branimir/wcr_ws/src/four_wheel_steering_controller/include/**",
+        "/home/branimir/wcr_ws/src/uros/micro-ROS-Agent/micro_ros_agent/include/**",
+        "/home/branimir/wcr_ws/src/wcr_stack/dynamixel-workbench/dynamixel_workbench_toolbox/include/**",
+        "/home/branimir/wcr_ws/src/wcr_stack/dynamixel_hardware/include/**",
+        "/home/branimir/wcr_ws/src/wcr_stack/transport_drivers/io_context/include/**",
+        "/home/branimir/wcr_ws/src/wcr_stack/transport_drivers/serial_driver/include/**",
+        "/home/branimir/wcr_ws/src/wcr_stack/transport_drivers/udp_driver/include/**",
+        "/home/branimir/wcr_ws/src/wcr_stack/vesc/vesc_ackermann/include/**",
+        "/home/branimir/wcr_ws/src/wcr_stack/vesc/vesc_driver/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

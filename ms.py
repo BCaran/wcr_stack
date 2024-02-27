@@ -1,1 +1,0 @@
-bok marko kako si 
