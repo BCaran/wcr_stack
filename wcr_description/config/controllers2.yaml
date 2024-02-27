@@ -1,0 +1,60 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    four_wheel_steering_controller:
+      type: four_wheel_steering_controller/FourWheelSteeringController
+
+four_wheel_steering_controller:
+  ros__parameters:
+  #Front left wheel and steering system
+    fl_wheel_name: ["FL_wheel"]
+    fl_steering_name: [FL_steering]
+    fl_position_x: 0.1125
+    fl_position_y: 0.1125
+    fl_wheel_radius: 0.05
+    fl_wheel_position_x_multiplier: 1.0
+    fl_wheel_position_y_multiplier: 1.0
+    fl_wheel_radius_multiplier: 1.0
+  
+  #Back left wheel and steering system
+    bl_wheel_name: ["BL_wheel"]
+    bl_steering_name: [BL_steering]
+    bl_position_x: 0.1125
+    bl_position_y: 0.1125
+    bl_wheel_radius: 0.05
+    bl_wheel_position_x_multiplier: 1.0
+    bl_wheel_position_y_multiplier: 1.0
+    bl_wheel_radius_multiplier: 1.0
+
+  #Back right wheel and steering system
+    br_wheel_name: ["BR_wheel"]
+    br_steering_name: [BR_steering]
+    br_position_x: 0.1125
+    br_position_y: 0.1125
+    br_wheel_radius: 0.05
+    br_wheel_position_x_multiplier: 1.0
+    br_wheel_position_y_multiplier: 1.0
+    br_wheel_radius_multiplier: 1.0
+
+  #Front right wheel and steering system
+    fr_wheel_name: ["FR_wheel"]
+    fr_steering_name: [FR_steering]
+    fr_position_x: 0.1125
+    fr_position_y: 0.1125
+    fr_wheel_radius: 0.05
+    fr_wheel_position_x_multiplier: 1.0
+    fr_wheel_position_y_multiplier: 1.0
+    fr_wheel_radius_multiplier: 1.0
+
+  #Odometry parameters
+    open_loop: false
+    enable_odom_tf: true
+    cmd_vel_timeout: 0.5
+    publish_rate: 50
+    
+    driving_position_feedback: false
+    steering_position_feedback: true
