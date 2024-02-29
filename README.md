@@ -15,7 +15,7 @@ colcon build
 Used for communication with driving and steering Dynamixel motors
 
 ## dynamixel_hardware
-Used as _ros2_control_ layer.
+Used as _ros2_control_ layer. \n
 Problem: current problem is that layer isn't supporting both position and velocity control modes for Dynamixel motors at once.
 
 # IMPORTANT!
