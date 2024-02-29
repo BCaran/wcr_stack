@@ -29,8 +29,10 @@ Problem: current problem is that layer isn't supporting both position and veloci
 ## _vesc_ and _transport_drivers_
 Used for communication with VESC that is controlling EDF addhesion system.
 
-#TO-DO LIST
+# TO-DO LIST
 - [ ] 4WIS4WID controller using _dynamixel-workbench_
 - [ ] package for controlling thruster motors (Teensy communication)
+- [ ] add _realsense T265_
+- [ ] add IMU to the robot
 - [ ] work on _dynamixel_hardware_ to be able to have both position and velocity control modes
 - [ ] 4WIS4WID controller using _ros2_control_ framework
