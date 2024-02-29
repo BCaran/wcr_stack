@@ -31,7 +31,6 @@ Used for communication with VESC that is controlling EDF addhesion system.
 
 #TO-DO LIST
 - [ ] 4WIS4WID controller using _dynamixel-workbench_
-- [x] package for controlling thruster motors (Teensy communication)
+- [ ] package for controlling thruster motors (Teensy communication)
 - [ ] work on _dynamixel_hardware_ to be able to have both position and velocity control modes
 - [ ] 4WIS4WID controller using _ros2_control_ framework
-- [ ] 
