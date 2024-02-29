@@ -10,11 +10,14 @@ cd ..
 rosdep install -i --from-path src --rosdistro humble -y
 colcon build
 ```
-IMPORTANT!
+IMPORTANT! \
 Before launching Dynamixel hardware interface, permission has to be added to USB port
 ```
 sudo usermod -aG dialout <linux_account>
 ```
+
+## _wcr_description_
+_urdf_ files and _ros2_control_ xacro files for Dynamixel motors. To visulize robot, only _display.launch.py_ should be used.
 
 ## _dynamixel-workbench_ and _dynamixel-workbench-msgs_ 
 Used for communication with driving and steering Dynamixel motors
@@ -22,5 +25,8 @@ Used for communication with driving and steering Dynamixel motors
 ## _dynamixel_hardware_
 Used as _ros2_control_ layer. \
 Problem: current problem is that layer isn't supporting both position and velocity control modes for Dynamixel motors at once.
+
+## _vesc_ and _transport_drivers_
+Used for communication with VESC that is controlling EDF addhesion system.
 
 
