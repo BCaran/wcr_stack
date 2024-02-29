@@ -15,7 +15,7 @@ Before launching Dynamixel hardware interface, permission has to be added to USB
 ```
 sudo usermod -aG dialout <linux_account>
 ```
-
+# Packages
 ## _wcr_description_
 _urdf_ files and _ros2_control_ xacro files for Dynamixel motors. To visulize robot, only _display.launch.py_ should be used.
 
@@ -29,5 +29,9 @@ Problem: current problem is that layer isn't supporting both position and veloci
 ## _vesc_ and _transport_drivers_
 Used for communication with VESC that is controlling EDF addhesion system.
 
-- [ ] incomplete task
-- [x] completed task
+#TO-DO LIST
+- [ ] 4WIS4WID controller using _dynamixel-workbench_
+- [x] package for controlling thruster motors (Teensy communication)
+- [ ] work on _dynamixel_hardware_ to be able to have both position and velocity control modes
+- [ ] 4WIS4WID controller using _ros2_control_ framework
+- [ ] 
