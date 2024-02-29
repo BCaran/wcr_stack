@@ -29,4 +29,5 @@ Problem: current problem is that layer isn't supporting both position and veloci
 ## _vesc_ and _transport_drivers_
 Used for communication with VESC that is controlling EDF addhesion system.
 
-
+- [ ] incomplete task
+- [x] completed task
