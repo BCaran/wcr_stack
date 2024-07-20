@@ -1,0 +1,8 @@
+# Request
+int64 command_id
+uint8[] request
+---
+# Response
+bool success
+int32 error_code
+uint8[] response
