@@ -1,0 +1,22 @@
+marvelmind_ros2:
+  ros__parameters:
+    hedgehog_pos_topic: "/hedgehog_pos"
+    hedgehog_pos_addressed_topic: "/hedgehog_pos_addressed"
+    hedgehog_pos_angle_topic: "/hedgehog_pos_ang"
+    hedgehog_imu_raw_topic: "/hedgehog_imu_raw"
+    hedgehog_imu_fusion_topic: "/hedgehog_imu_fusion"
+    hedgehog_telemetry_topic: "/hedgehog_telemetry" 
+    hedgehog_quality_topic: "/hedgehog_quality"
+    beacon_raw_distance_topic: "/beacon_raw_distance"
+    beacon_pos_addressed_topic: "/beacons_pos_addressed"
+    marvelmind_waypoint_topic: "/marvelmind_waypoint"
+    data_input_semaphore_name: "/data_input_semaphore"
+    marvelmind_publish_rate_in_hz: 200
+    marvelmind_tty_baudrate: 9600 # likely does not every need to change
+    marvelmind_tty_filename: "/dev/ttyACM0"
+
+marvelmind_api_ros2:
+  ros__parameters:
+    marvelmind_publish_rate_in_hz: 200
+    marvelmind_tty_baudrate: 9600 # likely does not every need to change
+    marvelmind_tty_filename: "/dev/ttyACM0"

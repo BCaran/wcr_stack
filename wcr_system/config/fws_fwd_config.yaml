@@ -1,0 +1,49 @@
+fwsfwd_controller:
+  ros__parameters:
+    cmd_vel_topic: "/wcr/cmd_vel"
+    joint_state_topic: "/wcr/joint_states"
+    odom_topic: "/wcr/odom"
+
+    dxl_usb_port: "/dev/ttyUSB0"
+    dynamixel_limit_max_velocity: 210
+    velocity_ms_constant_value_wheel: 41.6999850896
+
+    #FL_system
+    x_w_1: 0.1125
+    y_w_1: 0.1125
+    r_w_1: 0.0254
+    FL_wheel_P: 100
+    FL_wheel_I: 1920
+    FL_steering_P: 800
+    FL_steering_I: 0
+    FL_steering_D: 0
+
+    #BL_system
+    x_w_2: -0.1125
+    y_w_2: 0.1125
+    r_w_2: 0.0254
+    BL_wheel_P: 100
+    BL_wheel_I: 1920
+    BL_steering_P: 800
+    BL_steering_I: 0
+    BL_steering_D: 0
+
+    #BR_system
+    x_w_3: -0.1125
+    y_w_3: -0.1125
+    r_w_3: 0.0254
+    BR_wheel_P: 100
+    BR_wheel_I: 1920
+    BR_steering_P: 800
+    BR_steering_I: 0
+    BR_steering_D: 0
+
+    #FR_system
+    x_w_4: 0.1125
+    y_w_4: -0.1125
+    r_w_4: 0.0254
+    FR_wheel_P: 100
+    FR_wheel_I: 1920
+    FR_steering_P: 800
+    FR_steering_I: 0
+    FR_steering_D: 0
