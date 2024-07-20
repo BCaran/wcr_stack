@@ -36,3 +36,4 @@ Used for communication with VESC that is controlling EDF addhesion system.
 - [ ] add IMU to the robot
 - [ ] work on _dynamixel_hardware_ to be able to have both position and velocity control modes
 - [ ] 4WIS4WID controller using _ros2_control_ framework
+- []  ovo je samo proba
