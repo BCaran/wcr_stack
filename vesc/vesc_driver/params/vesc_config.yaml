@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-    port: "/dev/ttyTHS0"
+    port: "/dev/ttyTHS1"
     brake_max: 200000.0
     brake_min: -20000.0
     current_max: 100.0
