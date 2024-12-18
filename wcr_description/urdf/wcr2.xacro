@@ -3,7 +3,7 @@
 
     <xacro:property name="length" value="0.225" />
 	<xacro:property name="width" value="0.225" />
-	<xacro:property name="steering_height" value="0.06029" />
+	<xacro:property name="steering_height" value="0.05029" />
 	<xacro:property name="wheel_height" value="-0.035250" />
 
     <material name="gray">
@@ -26,7 +26,7 @@
 
     <link name="base_link">
         <visual>
-            <origin rpy="0 0 0" xyz="0 0 0.01"/>
+            <origin rpy="0 0 0" xyz="0 0 0.0103600017"/>
             <geometry>
                 <mesh filename="package://wcr_description/meshes/robotChasiss.stl" scale="0.001 0.001 0.001"/>
             </geometry>
