@@ -1,0 +1,4 @@
+source;share/wcr_description/local_setup.bash
+source;share/wcr_description/local_setup.dsv
+source;share/wcr_description/local_setup.sh
+source;share/wcr_description/local_setup.zsh

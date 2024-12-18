@@ -10,6 +10,8 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "std_srvs/srv/trigger.hpp"
+#include "tf2_ros/transform_broadcaster.h"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 
 #include <dynamixel_workbench_toolbox/dynamixel_workbench.h>
 
@@ -39,6 +41,10 @@ double r_ = 0.0254;
 double D_ = sqrt((a_ * a_) + (b_ * b_));
 double Rx_ = a_ / D_;
 double Ry_ = b_ / D_;
+
+std::vector<double> odometry_pose_covariance_;
+std::vector<double> odometry_twist_covariance_;
+
 
 //double x_w_r_[4] = {a_, -a_, -a_, a_};
 //double y_w_r_[4] = {b_, b_, -b_, -b_};
@@ -105,6 +111,20 @@ class FWSFWDController : public rclcpp::Node
         this->declare_parameter("FR_steering_I", 0);
         this->declare_parameter("FR_steering_D", 0);
 
+        this->declare_parameter<std::vector<double>>("odometry_pose_covariance", {0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                                    0.0, 0.01, 0.0, 0,0, 0,0, 0,0,
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.01});
+
+        this->declare_parameter<std::vector<double>>("odometry_twist_covariance", {0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                                    0.0, 0.01, 0.0, 0,0, 0,0, 0,0,
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.01});
+
 
         const char * log = nullptr;
 
@@ -114,31 +134,52 @@ class FWSFWDController : public rclcpp::Node
         publisher_odom_ = this->create_publisher<nav_msgs::msg::Odometry>(this->get_parameter("odom_topic").as_string(), 10);
         odometry_reset_ = this->create_service<std_srvs::srv::Trigger>("reset_odometry", std::bind(&FWSFWDController::odom_reset, this, std::placeholders::_1, std::placeholders::_2));
         timer_ = this->create_wall_timer(2ms, std::bind(&FWSFWDController::joint_state_callback, this));
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
         RCLCPP_INFO(this->get_logger(), "fwsfwd_controller Running");
-
         if (!dxl_wb.init(this->get_parameter("dxl_usb_port").as_string().c_str(), 3000000, &log)) {
             RCLCPP_INFO(this->get_logger(), "Dynamixels failed to init");
         }
         else{
             RCLCPP_INFO(this->get_logger(), "Dynamixels init succesful");
         }
+        
+        int64_t P_gains[8] = {this->get_parameter("FL_wheel_P").as_int(), this->get_parameter("BL_wheel_P").as_int(), this->get_parameter("BR_wheel_P").as_int(), this->get_parameter("FR_wheel_P").as_int(),
+                        this->get_parameter("FL_steering_P").as_int(), this->get_parameter("BL_steering_P").as_int(), this->get_parameter("BR_steering_P").as_int(), this->get_parameter("FR_steering_P").as_int()};
+        int64_t I_gains[8] = {this->get_parameter("FL_wheel_I").as_int(), this->get_parameter("BL_wheel_I").as_int(), this->get_parameter("BR_wheel_I").as_int(), this->get_parameter("FR_wheel_I").as_int(),
+                        this->get_parameter("FL_steering_I").as_int(), this->get_parameter("BL_steering_I").as_int(), this->get_parameter("BR_steering_I").as_int(), this->get_parameter("FR_steering_I").as_int()};
+        int64_t D_gains[4] = {this->get_parameter("FL_steering_D").as_int(), this->get_parameter("BL_steering_D").as_int(), this->get_parameter("BR_steering_D").as_int(), this->get_parameter("FR_steering_D").as_int()};
+        odometry_pose_covariance_ = this->get_parameter("odometry_pose_covariance").as_double_array();
+        odometry_twist_covariance_ = this->get_parameter("odometry_twist_covariance").as_double_array();
 
-        //Pinging motors
         for (uint i = 1; i < 9; ++i) {
             uint16_t model_number = 0;
             if (!dxl_wb.ping(i, &model_number, &log)) {
                 RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] isn't pinged", i);
             }
             if (i < 5 ){
-                if(!dxl_wb.setVelocityControlMode(i, &log)){
+                if(!dxl_wb.setVelocityControlMode(i, &log))
                     RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] didn't change velocity control mode", i);
-                }
+
+                if(!dxl_wb.itemWrite(i, "Velocity_P_Gain", P_gains[i-1], &log))
+                    RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] didn't change velocity P gain", i);
+
+                if(!dxl_wb.itemWrite(i, "Velocity_I_Gain", I_gains[i-1], &log))
+                    RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] didn't change velocity I gain", i);
             }
             else{
-                if(!dxl_wb.setPositionControlMode(i, &log)){
+                if(!dxl_wb.setPositionControlMode(i, &log))
                     RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] didn't change position control mode", i);
-                }
+
+                if(!dxl_wb.itemWrite(i, "Position_P_Gain", P_gains[i-1], &log))
+                    RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] didn't change position P gain", i);
+
+                if(!dxl_wb.itemWrite(i, "Position_I_Gain", I_gains[i-1], &log))
+                    RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] didn't change position I gain", i);
+                
+                if(!dxl_wb.itemWrite(i, "Position_D_Gain", D_gains[i - 5], &log))
+                    RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] didn't change position D gain", i);
+
             }
             if (!dxl_wb.torqueOn(i, &log)) {
                 RCLCPP_WARN(this->get_logger(), "Dynamixel [%i] torque on error", i);
@@ -248,8 +289,6 @@ class FWSFWDController : public rclcpp::Node
             double inputRobotSpeeds[3] = {msg->linear.x, msg->linear.y, msg->angular.z};
             double outputSpeedsVxVy[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; //needed speed for each motor
 
-            double velocity_constant_value = 1 / (0.229 * 0.10472 * r_);
-
             //Množenje matrica dimenzija robota i ulaznih brzina kako bi se dobile izlazne brzine
             for(int i = 0; i < 8; i++)
                 for(int j = 0; j < 3; j++)
@@ -307,6 +346,8 @@ class FWSFWDController : public rclcpp::Node
             dxl_wb.getSyncReadData(kPresentPositionVelocityCurrentIndex, motors_ids_, 8, 132, 4, positions, &log);
             auto joint_states = sensor_msgs::msg::JointState();
             auto odometry = nav_msgs::msg::Odometry();
+            geometry_msgs::msg::TransformStamped t;
+            joint_states.header.stamp = this->get_clock()->now();
             joint_states.name = {"FL_wheel", "BL_wheel", "BR_wheel", "FR_wheel", "FL_steering", "BL_steering", "BR_steering", "FR_steering"};
             joint_states.position = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
             joint_states.velocity = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -355,6 +396,7 @@ class FWSFWDController : public rclcpp::Node
             odometry.header.stamp = this->get_clock()->now();
             odometry.header.frame_id = "odom";
             odometry.child_frame_id = "base_link";
+            //Pose
             odometry.pose.pose.position.x = this->x_;
             odometry.pose.pose.position.y = this->y_;
             odometry.pose.pose.position.z = 0.0;
@@ -362,13 +404,31 @@ class FWSFWDController : public rclcpp::Node
             odometry.pose.pose.orientation.y = quat.y();
             odometry.pose.pose.orientation.z = quat.z();
             odometry.pose.pose.orientation.w = quat.w();
+
+            //Pose covariance
+            for(int i = 0; i<36; i++){
+                odometry.pose.covariance[i] = odometry_pose_covariance_[i];
+                odometry.twist.covariance[i] = odometry_twist_covariance_[i];
+            }
             odometry.twist.twist.linear.x = v_x;
             odometry.twist.twist.linear.y = v_y;
             odometry.twist.twist.linear.z = 0.0;
-            odometry.twist.twist.linear.x = 0.0;
-            odometry.twist.twist.linear.y = 0.0;
-            odometry.twist.twist.linear.z = omega;
+            odometry.twist.twist.angular.x = 0.0;
+            odometry.twist.twist.angular.y = 0.0;
+            odometry.twist.twist.angular.z = omega;
 
+            t.header.stamp = this->get_clock()->now();
+            t.header.frame_id = "odom";
+            t.child_frame_id = "base_link";
+            t.transform.translation.x = this->x_;
+            t.transform.translation.y = this->y_;
+            t.transform.translation.z = 0.0;
+            t.transform.rotation.x = quat.x();
+            t.transform.rotation.y = quat.y();
+            t.transform.rotation.z = quat.z();
+            t.transform.rotation.w = quat.w();
+
+            tf_broadcaster_->sendTransform(t);
             publisher_odom_->publish(odometry);
 
         }
@@ -380,6 +440,7 @@ class FWSFWDController : public rclcpp::Node
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_cmdvel_;
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscription_jointcmd_;
     rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr odometry_reset_;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
 };
 

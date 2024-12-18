@@ -1,0 +1,26 @@
+launch:
+- arg:
+    name: "server"
+    default: "192.168.1.35"
+- arg:
+    name: "port"
+    default: "3883"
+
+- node:
+    pkg: "vrpn_mocap"
+    namespace: "optitrack"
+    exec: "client_node"
+    name: "vrpn_mocap_client_node"
+    param:
+    -
+      from: "$(find-pkg-share wcr_system)/config/optitrack_config.yaml"
+    -
+      name: "server"
+      value: "$(var server)"
+    -
+      name: "port"
+      value: "$(var port)"
+
+- node:
+    pkg: "wcr_system"
+    exec: "optitrack_help_node"

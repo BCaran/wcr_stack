@@ -8,7 +8,7 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
 
 
-configurable_parameters = [{'name': 'camera_name',                  'default': 'camera', 'description': 'camera unique name'},
+configurable_parameters = [{'name': 'camera_name',                  'default': 'd435i', 'description': 'camera unique name'},
                            {'name': 'serial_no',                    'default': "''", 'description': 'choose device by serial number'},
                            {'name': 'usb_port_id',                  'default': "''", 'description': 'choose device by usb port id'},
                            {'name': 'device_type',                  'default': 'd435i', 'description': 'choose device by type'},
@@ -18,11 +18,11 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'log_level',                    'default': 'info', 'description': 'debug log level [DEBUG|INFO|WARN|ERROR|FATAL]'},
                            {'name': 'output',                       'default': 'screen', 'description': 'pipe node output [screen|log]'},
                            {'name': 'depth_module.profile',         'default': '0,0,0', 'description': 'depth module profile'},                           
-                           {'name': 'enable_depth',                 'default': 'false', 'description': 'enable depth stream'},
+                           {'name': 'enable_depth',                 'default': 'true', 'description': 'enable depth stream'},
                            {'name': 'rgb_camera.profile',           'default': '0,0,0', 'description': 'color image width'},
                            {'name': 'enable_color',                 'default': 'true', 'description': 'enable color stream'},
-                           {'name': 'enable_infra1',                'default': 'false', 'description': 'enable infra1 stream'},
-                           {'name': 'enable_infra2',                'default': 'false', 'description': 'enable infra2 stream'},
+                           {'name': 'enable_infra1',                'default': 'true', 'description': 'enable infra1 stream'},
+                           {'name': 'enable_infra2',                'default': 'true', 'description': 'enable infra2 stream'},
                            {'name': 'infra_rgb',                    'default': 'false', 'description': 'enable infra2 stream'},
                            {'name': 'tracking_module.profile',      'default': '0,0,0', 'description': 'fisheye width'},
                            {'name': 'enable_fisheye1',              'default': 'true', 'description': 'enable fisheye1 stream'},
@@ -93,7 +93,7 @@ def generate_launch_description():
                             , PythonExpression([LaunchConfiguration("config_file")])
                             ],
                 output='screen',
-                arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
+                arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')]
                 ),
             ])
     else:
