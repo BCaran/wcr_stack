@@ -35,9 +35,9 @@ bno055:
     i2c_addr: 0x28
     data_query_frequency: 100
     calib_status_frequency: 0.1
-    frame_id: "bno055"
+    frame_id: "imu_link"
     operation_mode: 0x0C
-    placement_axis_remap: "P2"
+    placement_axis_remap: "P0"
     acc_factor: 100.0
     mag_factor: 16000000.0
     gyr_factor: 900.0

@@ -34,10 +34,10 @@ bno055:
     i2c_bus: 8
     i2c_addr: 0x28
     data_query_frequency: 100
-    calib_status_frequency: 0.1
-    frame_id: "bno055"
+    calib_status_frequency: 10.0
+    frame_id: "imu_link"
     operation_mode: 0x0C
-    placement_axis_remap: "P2"
+    placement_axis_remap: "P0"
     acc_factor: 100.0
     mag_factor: 16000000.0
     gyr_factor: 900.0
@@ -49,7 +49,7 @@ bno055:
     ## Sensor standard deviation [x,y,z]
     ## Used to calculate covariance matrices
     ## defaults are used if parameters below are not provided
-    # variance_acc: [0.0, 0.0, 0.0] # [m/s^2]
-    # variance_angular_vel: [0.0, 0.0, 0.0] # [rad/s]
-    # variance_orientation: [0.0, 0.0, 0.0] # [rad]
-    # variance_mag: [0.0, 0.0, 0.0] # [Tesla]
+    variance_acc: [0.017, 0.017, 0.017] # [m/s^2]
+    variance_angular_vel: [0.04, 0.04, 0.04] # [rad/s]
+    variance_orientation: [0.0159, 0.0159, 0.0159] # [rad]
+    variance_mag: [0.0, 0.0, 0.0] # [Tesla]

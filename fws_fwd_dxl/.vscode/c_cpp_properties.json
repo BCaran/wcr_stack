@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "${default}",
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "includePath": [
+                "/home/wcr/wcr_ws/install/marvelmind_ros2_msgs/include/**",
+                "/home/wcr/wcr_ws/install/dynamixel_workbench_toolbox/include/**",
+                "/home/wcr/wcr_ws/install/dynamixel_workbench_msgs/include/**",
+                "/opt/ros/foxy/include/**",
+                "/home/wcr/wcr_ws/src/dynamixel-workbench/dynamixel_workbench_toolbox/include/**",
+                "/home/wcr/wcr_ws/src/fws_fwd_dxl/include/**",
+                "/home/wcr/wcr_ws/src/marvelmind_ros2_upstream/include/**",
+                "/usr/include/**",
+                "/opt/ros/foxy/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-arm64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++14"
+        }
+    ],
+    "version": 4
+}

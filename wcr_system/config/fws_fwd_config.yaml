@@ -8,7 +8,7 @@ fwsfwd_controller:
     dynamixel_limit_max_velocity: 210
     velocity_ms_constant_value_wheel: 41.6999850896
 
-    #FL_system
+    # FL System
     x_w_1: 0.1125
     y_w_1: 0.1125
     r_w_1: 0.0254
@@ -18,7 +18,7 @@ fwsfwd_controller:
     FL_steering_I: 0
     FL_steering_D: 0
 
-    #BL_system
+    # BL System
     x_w_2: -0.1125
     y_w_2: 0.1125
     r_w_2: 0.0254
@@ -28,7 +28,7 @@ fwsfwd_controller:
     BL_steering_I: 0
     BL_steering_D: 0
 
-    #BR_system
+    # BR System
     x_w_3: -0.1125
     y_w_3: -0.1125
     r_w_3: 0.0254
@@ -38,7 +38,7 @@ fwsfwd_controller:
     BR_steering_I: 0
     BR_steering_D: 0
 
-    #FR_system
+    # FR System
     x_w_4: 0.1125
     y_w_4: -0.1125
     r_w_4: 0.0254
@@ -47,3 +47,21 @@ fwsfwd_controller:
     FR_steering_P: 800
     FR_steering_I: 0
     FR_steering_D: 0
+
+    odometry_pose_covariance: [
+      1e-6, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 1e-6, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 1e-6
+    ]
+
+    odometry_twist_covariance: [
+      1e-6, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 1e-6, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 1e-6
+    ]
