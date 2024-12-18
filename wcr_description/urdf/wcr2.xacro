@@ -22,11 +22,11 @@
         <color rgba="1 1 0 1"/>
     </material>
 
-    <!-- BASE LINK proba s dualboota-->
+    <!-- BASE LINK -->
 
     <link name="base_link">
         <visual>
-            <origin rpy="0 ${-pi/2} ${pi}" xyz="0 0 0.01"/>
+            <origin rpy="0 0 0" xyz="0 0 0.01"/>
             <geometry>
                 <mesh filename="package://wcr_description/meshes/robotChasiss.stl" scale="0.001 0.001 0.001"/>
             </geometry>
