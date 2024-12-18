@@ -11,7 +11,7 @@ def generate_launch_description():
 	realsense_t265_launch = IncludeLaunchDescription(PythonLaunchDescriptionSource(['/home/wcr/wcr_ws/src/realsense-ros-3.2.3/realsense2_camera/launch/rs_t265_launch.py']))
 	ps4_joystick_launch = IncludeLaunchDescription(PythonLaunchDescriptionSource(['/home/wcr/wcr_ws/src/wcr_system/launch/ps4.launch.py']))
 	marvelmind_config = os.path.join(get_package_share_directory('wcr_system'), 'config', 'marvelmind_ros2_config.yaml')
-	robot_description_config = xacro.process_file('/home/wcr/wcr_ws/src/wcr_description/urdf/wcr2.urdf.xacro')
+	robot_description_config = xacro.process_file('/home/wcr/wcr_ws/src/wcr_description/urdf/wcr.urdf.xacro')
 	fws_fwd_config = '/home/wcr/wcr_ws/src/wcr_system/config/fws_fwd_config.yaml'
 	bno055_config = '/home/wcr/wcr_ws/src/wcr_system/config/bno055_params_i2c.yaml'
 
