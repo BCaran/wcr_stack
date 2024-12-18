@@ -22,7 +22,7 @@
         <color rgba="1 1 0 1"/>
     </material>
 
-    <!-- BASE LINK -->
+    <!-- BASE LINK proba s dualboota-->
 
     <link name="base_link">
         <visual>
