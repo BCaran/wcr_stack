@@ -46,7 +46,7 @@
     <link name="optitrack_link">
     </link>
 
-    <!-- IMU LINK - dobiven preko Optitrack-a...nije baš najbolje-->
+    <!-- IMU LINK - dobiven preko Optitrack-a...nije baš najbolje nanovo-->
 
     <joint name="imu_joint" type="fixed">
         <parent link="optitrack_link"/>
