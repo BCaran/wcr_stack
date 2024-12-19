@@ -3,7 +3,7 @@
 
     <xacro:property name="length" value="0.225" />
 	<xacro:property name="width" value="0.225" />
-	<xacro:property name="steering_height" value="0.05029" />
+	<xacro:property name="steering_height" value="0.0606500017" /> <!--STEERING HEIGHT + OFFSET FROM BASE LINK TO CHASSIS-->
 	<xacro:property name="wheel_height" value="-0.035250" />
 
     <material name="gray">
@@ -25,13 +25,6 @@
     <!-- BASE LINK -->
 
     <link name="base_link">
-        <visual>
-            <origin rpy="0 0 0" xyz="0 0 0.0103600017"/>
-            <geometry>
-                <mesh filename="package://wcr_description/meshes/robotChasiss.stl" scale="0.001 0.001 0.001"/>
-            </geometry>
-            <material name="gray"/>
-        </visual>
     </link>
 
     <!-- OPTITRACK LINK -->
@@ -80,6 +73,25 @@
 
 
     <link name="marvelmind_link">
+    </link>
+
+    <!-- CHASSIS LINK-->
+
+    <joint name="chassis_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="chassis_link"/>
+        <origin xyz="0 0 0.0103600017"/>
+    </joint>
+
+
+    <link name="chassis_link">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://wcr_description/meshes/robotChassis.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="gray"/>
+        </visual>
     </link>
 
 
