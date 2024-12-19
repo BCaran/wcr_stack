@@ -3,7 +3,7 @@
 
     <xacro:property name="length" value="0.225" />
 	<xacro:property name="width" value="0.225" />
-	<xacro:property name="steering_height" value="0.0606500017" /> <!--STEERING HEIGHT + OFFSET FROM BASE LINK TO CHASSIS-->
+	<xacro:property name="steering_height" value="0.05029" /> 
 	<xacro:property name="wheel_height" value="-0.035250" />
 
     <material name="gray">
@@ -42,7 +42,7 @@
     <!-- IMU LINK -->
 
     <joint name="imu_joint" type="fixed">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="imu_link"/>
         <origin xyz="0.06579 0 0.08934"/>
     </joint> 
@@ -54,7 +54,7 @@
     <!-- T265 LINK -->
 
     <joint name="camera_joint" type="fixed">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="t265_link"/>
         <origin xyz="0.16 0 0.075"/>
     </joint>
@@ -66,7 +66,7 @@
     <!-- MARVELMIND LINK -->
 
     <joint name="marvelmind_joint" type="fixed">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="marvelmind_link"/>
         <origin xyz="-0.1223 0.000 0.1205"/>
     </joint>
@@ -98,7 +98,7 @@
     <!-- FRONT LEFT SYSTEM -->
     <joint name="FL_steering" type="revolute">
         <limit effort="100.0" lower="${-pi/2}" upper="${pi/2}" velocity="5.23598775"/>
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="FL_steering_link"/>
         <origin xyz="${length/2} ${width/2} ${steering_height}"/>
         <axis xyz="0 0 1"/>
@@ -136,7 +136,7 @@
 
     <joint name="BL_steering" type="revolute">
         <limit effort="100.0" lower="${-pi/2}" upper="${pi/2}" velocity="5.23598775"/>
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="BL_steering_link"/>
         <origin xyz="-${length/2} ${width/2} ${steering_height}"/>
         <axis xyz="0 0 1"/>
@@ -174,7 +174,7 @@
 
     <joint name="BR_steering" type="revolute">
         <limit effort="100.0" lower="${-pi/2}" upper="${pi/2}" velocity="5.23598775"/>
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="BR_steering_link"/>
         <origin xyz="-${length/2} -${width/2} ${steering_height}"/>
         <axis xyz="0 0 1"/>
@@ -212,7 +212,7 @@
 
     <joint name="FR_steering" type="revolute">
         <limit effort="100.0" lower="${-pi/2}" upper="${pi/2}" velocity="5.23598775"/>
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="FR_steering_link"/>
         <origin xyz="${length/2} -${width/2} ${steering_height}"/>
         <axis xyz="0 0 1"/>
