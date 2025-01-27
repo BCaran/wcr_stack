@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/opt/ros/humble/include/**",
+        "/home/branimir/wcr_ws/src/dynamixel-workbench/dynamixel_workbench_toolbox/include/**",
+        "/home/branimir/wcr_ws/src/marvelmind_ros2_upstream/include/**",
+        "/home/branimir/wcr_ws/src/realsense-ros-3.2.3/realsense2_camera/include/**",
+        "/home/branimir/wcr_ws/src/robot_localization/include/**",
+        "/home/branimir/wcr_ws/src/transport_drivers/io_context/include/**",
+        "/home/branimir/wcr_ws/src/transport_drivers/serial_driver/include/**",
+        "/home/branimir/wcr_ws/src/transport_drivers/udp_driver/include/**",
+        "/home/branimir/wcr_ws/src/vesc/vesc_ackermann/include/**",
+        "/home/branimir/wcr_ws/src/vesc/vesc_driver/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
