@@ -63,6 +63,18 @@
     <link name="t265_link">
     </link>
 
+    <!-- T265 ODOM -->
+
+    <joint name="camera_odom_joint" type="fixed">
+        <parent link="chassis_link"/>
+        <child link="t265_odom_frame"/>
+        <origin xyz="0.14885 0.00922 0.05459"/>
+    </joint>
+
+
+    <link name="t265_odom_frame">
+    </link>
+
     <!-- MARVELMIND LINK -->
 
     <joint name="marvelmind_joint" type="fixed">

@@ -90,6 +90,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'tracking_module.frames_queue_size', 'default': "''", 'description': 'meh'},
                            {'name': 'tracking_module.enable_pose_jumping', 'default': "''", 'description': 'meh'},
                            {'name': 'enable_pose', 'default': "''", 'description': 'enable pose stream'},
+                           {'name': 'publish_odom_tf', 'default': 'true', 'description': 'Enable publishing T265 pose as TF'},
                           ]
 
 def declare_configurable_parameters(parameters):

@@ -26,11 +26,6 @@ def generate_launch_description():
 			executable = 'bno055',
 			parameters = [bno055_config]
 		),
-		Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            arguments = ['0.16', '0', '0.075', '0', '0', '0', 'odom', 't265_odom_frame']
-        ),
 
 		#Node(
         #    package='tf2_ros',
