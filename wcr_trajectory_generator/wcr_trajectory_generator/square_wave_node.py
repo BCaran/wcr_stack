@@ -40,7 +40,6 @@ class SquareWaveTrajectoryNode(Node):
 
         self.start_time = self.get_clock().now().nanoseconds
         self.current_time_s = (self.get_clock().now().nanoseconds - self.start_time) * 1e-9
-        self.last_time_s = (self.get_clock().now().nanoseconds - self.start_time) * 1e-9
 
         self.dy_repeats = 0.0
         self.last_dy_repeats = 0.0
@@ -50,9 +49,8 @@ class SquareWaveTrajectoryNode(Node):
     def trajectory_callback(self):
         if self.dy_repeats < repeats:
             self.current_time_s = (self.get_clock().now().nanoseconds - self.start_time) * 1e-9
-            dt = self.current_time_s - self.last_time_s
             self.desired_pose_twist_msg.header.stamp = self.get_clock().now().to_msg()
-            self.desired_pose_twist_msg.header.frame_id = "base_link"
+            self.desired_pose_twist_msg.header.frame_id = "odom"
             cycle_time = self.current_time_s % cycle_duration  # Time within the current cycle
             #Ravno po X
             if 0 < cycle_time <= x_duration:
