@@ -1,0 +1,6 @@
+square_wave_trajectory:
+  ros_parameters:
+    x_amplitude: 1.0
+    dy_amplitude: 0.1
+    vx_amplitude: 0.05
+    vy_amplitude: 0.05
