@@ -7,22 +7,26 @@ import rclpy.time
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64MultiArray
-from geometry_msgs.msg import Twist, PoseStamped
-from std_srvs.srv import Trigger
+from geometry_msgs.msg import Twist
 import numpy as np
+from wcr_interfaces.msg import DesiredPoseTwist
 
 
 class NonLinearController(Node):
     def __init__(self):
         super().__init__('non_linear_controller')
         self.pose_sub = self.create_subscription(Odometry, '/wcr/odom', self.odometry_callback, 10)
+        self.desired_pose_twist_sub = self.create_subscription(DesiredPoseTwist, '/wcr/desired_pose_twist', self.desired_trajectory_callback, 10)
         self.joint_cmd_pub = self.create_publisher(Float64MultiArray, '/wcr/joint_cmd', 10)
         self.cmd_vel_pub = self.create_publisher(Twist, '/wcr/cmd_vel', 10)
-        self.pose_desired_pub = self.create_publisher(PoseStamped, "nonlinear_controller/pose_desired", 10)
         self.controller_timer = self.create_timer(1/62.5, self.controller_callback)
-        self.start_controller = self.create_service(Trigger, "start_controller", self.start_controller_callback)
-        self.stop_controller = self.create_service(Trigger, "stop_controller", self.stop_controller_callback)
         self.declare_parameter("start_using_srv", True)
+        self.x_d_ = 0.0
+        self.y_d_ = 0.0
+        self.th_d_ = 0.0
+        self.vx_d_ = 0.0
+        self.vy_d_ = 0.0
+        self.omega_d_ = 0.0
         self.x_ = 0.0
         self.y_ = 0.0
         self.th_ = 0.0
@@ -47,24 +51,6 @@ class NonLinearController(Node):
             self.controller_started = False
         else:
             self.controller_started = True
-
-    def stop_controller_callback(self, request, response):
-        response.success = True
-        response.message = "Controller stopped"
-        self.controller_started = False
-        self.cmd_vel_c.linear.x = 0.0
-        self.cmd_vel_c.linear.y = 0.0
-        self.cmd_vel_c.angular.z = 0.0
-        self.cmd_vel_pub.publish(self.cmd_vel_c)
-        return response
-    
-    def start_controller_callback(self, request, response):
-        response.success = True
-        response.message = "Controller started"
-        self.controller_started = True
-        self.last_time_ = self.get_clock().now().nanoseconds / 1e9
-        self.current_time_ = self.get_clock().now().nanoseconds / 1e9
-        return response
         
     def controller_callback(self):
         if(self.controller_started == True and self.normalized_time_ < 40):
@@ -72,14 +58,14 @@ class NonLinearController(Node):
             dt = self.current_time_ - self.last_time_
             self.normalized_time_ += dt
             #Reference trajectory
-            x_d = 0.0
-            y_d = 0.05*self.normalized_time_
-            th_d = 0.0
+            x_d = self.x_d_
+            y_d = self.y_d_
+            th_d = self.th_d_
 
             #Derivative of trajectory
-            dot_x_d = 0.0
-            dot_y_d = 0.05
-            dot_th_d = 0.0
+            dot_x_d = self.vx_d_
+            dot_y_d = self.vy_d_
+            dot_th_d = self.omega_d_
 
             #Rotated derivative of trajectory
             rot_dot_x_d = dot_x_d * math.cos(th_d) + dot_y_d * math.sin(th_d)
@@ -123,30 +109,11 @@ class NonLinearController(Node):
                 W_c[i] = (-self.y_w_[i]*math.cos(delta_c[i]) + self.x_w_[i]*math.sin(delta_c[i]))/(4*math.pow(self.x_w_[i], 2) + 4*math.pow(self.y_w_[i], 2))
                 v_th_c +=  W_c[i]*v_c[i]
 
-            #print("e_x:", e_x)
-            #print("e_y:", e_y)
-            #print("e_th:", e_th)
-            #print("e_x_i:", self.e_x_i_)
-
-            #self.joint_cmd_pub.publish(self.q_c_)
             self.cmd_vel_c.linear.x = v_x_c
             self.cmd_vel_c.linear.y = v_y_c
             self.cmd_vel_c.angular.z = v_th_c
 
-
-            desired_pose = PoseStamped()
-            desired_pose.header.stamp = self.get_clock().now().to_msg()
-            desired_pose.header.frame_id = "odom"
-            desired_pose.pose.position.x = x_d
-            desired_pose.pose.position.y = y_d
-            quat = quaternion_from_euler(0.0, 0.0, th_d)
-            desired_pose.pose.orientation.x = quat[0]
-            desired_pose.pose.orientation.y = quat[1]
-            desired_pose.pose.orientation.z = quat[2]
-            desired_pose.pose.orientation.w = quat[3]
-
             self.cmd_vel_pub.publish(self.cmd_vel_c)
-            self.pose_desired_pub.publish(desired_pose)
 
             self.last_time_ = self.get_clock().now().nanoseconds / 1e9
         elif (self.normalized_time_ > 40 and self.normalized_time_ < 45):
@@ -161,10 +128,15 @@ class NonLinearController(Node):
         self.th_ = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
         self.th_  = self.th_ [2]
 
-    #def joint_states_callback(self, msg):
-    #    for i in range(4):
-    #        self.q_[i] = msg.velocity[i]
-    #        self.q_[i+4] = msg.position[i + 4]
+    def desired_trajectory_callback(self, msg):
+        self.x_d_ = msg.pose.position.x
+        self.y_d_ = msg.pose.position.y
+        self.th_d_ = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+        self.th_d_  = self.th_ [2]
+
+        self.vx_d_ = msg.twist.linear.x
+        self.vy_d_ = msg.twist.linear.y
+        self.omega_d_ = msg.twist.angular.z
 
 def main(args=None):
     rclpy.init(args=args)
@@ -173,9 +145,6 @@ def main(args=None):
 
     rclpy.spin(minimal_subscriber)
 
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
     minimal_subscriber.destroy_node()
     rclpy.shutdown()
 
