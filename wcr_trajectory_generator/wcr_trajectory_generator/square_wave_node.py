@@ -48,55 +48,62 @@ class SquareWaveTrajectoryNode(Node):
         self.desired_pose_twist_msg = DesiredPoseTwist()
 
     def trajectory_callback(self):
-        self.current_time_s = (self.get_clock().now().nanoseconds - self.start_time) * 1e-9
-        dt = self.current_time_s - self.last_time_s
-        self.desired_pose_twist_msg.header.stamp = self.get_clock().now().to_msg()
-        self.desired_pose_twist_msg.header.frame_id = "base_link"
-        cycle_time = self.current_time_s % cycle_duration  # Time within the current cycle
-        #Ravno po X
-        if 0 < cycle_time <= x_duration:
-            self.desired_pose_twist_msg.pose.position.x = vx_amplitude * cycle_time
-            self.desired_pose_twist_msg.twist.linear.x = vx_amplitude
-            self.desired_pose_twist_msg.twist.linear.y = 0.0
-            self.last_dy_repeats = self.dy_repeats
-        #Pauza 1 sekundu
-        elif x_duration < cycle_time <= x_duration + pause_duration:
+        if self.dy_repeats < repeats:
+            self.current_time_s = (self.get_clock().now().nanoseconds - self.start_time) * 1e-9
+            dt = self.current_time_s - self.last_time_s
+            self.desired_pose_twist_msg.header.stamp = self.get_clock().now().to_msg()
+            self.desired_pose_twist_msg.header.frame_id = "base_link"
+            cycle_time = self.current_time_s % cycle_duration  # Time within the current cycle
+            #Ravno po X
+            if 0 < cycle_time <= x_duration:
+                self.desired_pose_twist_msg.pose.position.x = vx_amplitude * cycle_time
+                self.desired_pose_twist_msg.twist.linear.x = vx_amplitude
+                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                self.last_dy_repeats = self.dy_repeats
+            #Pauza 1 sekundu
+            elif x_duration < cycle_time <= x_duration + pause_duration:
+                self.desired_pose_twist_msg.twist.linear.x = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = 0.0
+            #Po y osi
+            elif x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration:
+                self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude * (cycle_time - x_duration - pause_duration)
+                self.desired_pose_twist_msg.twist.linear.x = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude
+            #Pauza 1 sekundu
+            elif x_duration + pause_duration + y_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration:
+                self.desired_pose_twist_msg.twist.linear.x = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                if(self.dy_repeats == self.last_dy_repeats):
+                    self.dy_repeats += 1.0
+            #Unazad po X osi
+            elif x_duration + pause_duration + y_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration:
+                self.desired_pose_twist_msg.pose.position.x = x_amplitude - vx_amplitude * (cycle_time - x_duration - pause_duration - y_duration - pause_duration)
+                self.desired_pose_twist_msg.twist.linear.x = -vx_amplitude
+                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                self.last_dy_repeats = self.dy_repeats
+            #Pauza 1 sekundu
+            elif x_duration + pause_duration + y_duration + pause_duration + x_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration:
+                self.desired_pose_twist_msg.twist.linear.x = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = 0.0
+            #Po Y osi
+            elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration:
+                self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude*(cycle_time - (x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration))
+                self.desired_pose_twist_msg.twist.linear.x = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude
+            #Pauza 1 sekundu
+            elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration + pause_duration:
+                self.desired_pose_twist_msg.twist.linear.x = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                if(self.dy_repeats == self.last_dy_repeats):
+                    self.dy_repeats += 1.0
+        
+            self.pose_twist_publisher.publish(self.desired_pose_twist_msg)
+        else:
+            self.desired_pose_twist_msg.header.stamp = self.get_clock().now().to_msg()
+            self.desired_pose_twist_msg.header.frame_id = "base_link"
+            self.pose_twist_publisher.publish(self.desired_pose_twist_msg)
             self.desired_pose_twist_msg.twist.linear.x = 0.0
             self.desired_pose_twist_msg.twist.linear.y = 0.0
-        #Po y osi
-        elif x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration:
-            self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude * (cycle_time - x_duration - pause_duration)
-            self.desired_pose_twist_msg.twist.linear.x = 0.0
-            self.desired_pose_twist_msg.twist.linear.y = vy_amplitude
-        #Pauza 1 sekundu
-        elif x_duration + pause_duration + y_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration:
-            self.desired_pose_twist_msg.twist.linear.x = 0.0
-            self.desired_pose_twist_msg.twist.linear.y = 0.0
-            if(self.dy_repeats == self.last_dy_repeats):
-                self.dy_repeats += 1.0
-        #Unazad po X osi
-        elif x_duration + pause_duration + y_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration:
-            self.desired_pose_twist_msg.pose.position.x = x_amplitude - vx_amplitude * (cycle_time - x_duration - pause_duration - y_duration - pause_duration)
-            self.desired_pose_twist_msg.twist.linear.x = -vx_amplitude
-            self.desired_pose_twist_msg.twist.linear.y = 0.0
-            self.last_dy_repeats = self.dy_repeats
-        #Pauza 1 sekundu
-        elif x_duration + pause_duration + y_duration + pause_duration + x_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration:
-            self.desired_pose_twist_msg.twist.linear.x = 0.0
-            self.desired_pose_twist_msg.twist.linear.y = 0.0
-        #Po Y osi
-        elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration:
-            self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude*(cycle_time - (x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration))
-            self.desired_pose_twist_msg.twist.linear.x = 0.0
-            self.desired_pose_twist_msg.twist.linear.y = vy_amplitude
-        #Pauza 1 sekundu
-        elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration + pause_duration:
-            self.desired_pose_twist_msg.twist.linear.x = 0.0
-            self.desired_pose_twist_msg.twist.linear.y = 0.0
-            if(self.dy_repeats == self.last_dy_repeats):
-                self.dy_repeats += 1.0
-    
-        self.pose_twist_publisher.publish(self.desired_pose_twist_msg)
 
     def path_calblback(self):
         self.path_msg_.header.stamp = self.get_clock().now().to_msg()
