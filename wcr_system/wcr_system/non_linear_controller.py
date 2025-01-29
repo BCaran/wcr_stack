@@ -37,8 +37,8 @@ class NonLinearController(Node):
         self.cmd_vel_c = Twist()
         self.x_w_ = [0.1125, -0.1125, -0.1125, 0.1125]
         self.y_w_ = [0.1125, 0.1125, -0.1125, -0.1125]
-        self.kp_x_ = 2
-        self.kp_y_ = 2
+        self.kp_x_ = 5
+        self.kp_y_ = 5
         self.kp_th_ = 2
         self.ki_x_ = 0.0
         self.ki_y_ = 0.0
