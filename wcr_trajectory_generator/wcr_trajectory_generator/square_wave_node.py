@@ -7,16 +7,16 @@ import numpy as np
 from wcr_interfaces.msg import DesiredPoseTwist
 from scipy.interpolate import interp1d
 
-x_amplitude = 1.0
-dy_amplitude = 0.1
+x_amplitude = 0.3
+dy_amplitude = -0.1
 vx_amplitude = 0.05
-vy_amplitude = 0.05
+vy_amplitude = -0.05
 
 # Parameters for the custom wave pattern (x-t)
 x_duration = x_amplitude/vx_amplitude  # Duration of positive phase for x-t (seconds)
 y_duration = dy_amplitude/vy_amplitude
-pause_duration = 1  # Duration of pause for both pauses in x-t (seconds)
-repeats = 6  # Number of repetitions
+pause_duration = 2  # Duration of pause for both pauses in x-t (seconds)
+repeats = 3  # Number of repetitions
 sampling_rate = 1000  # Samples per second
 
 # Total duration of one cycle (positive, first pause, negative, second pause)
@@ -61,7 +61,7 @@ class SquareWaveTrajectoryNode(Node):
             #Pauza 1 sekundu
             elif x_duration < cycle_time <= x_duration + pause_duration:
                 self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude * 1e-3
             #Po y osi
             elif x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration:
                 self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude * (cycle_time - x_duration - pause_duration)
@@ -82,7 +82,7 @@ class SquareWaveTrajectoryNode(Node):
             #Pauza 1 sekundu
             elif x_duration + pause_duration + y_duration + pause_duration + x_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration:
                 self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude * 1e-3
             #Po Y osi
             elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration:
                 self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude*(cycle_time - (x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration))

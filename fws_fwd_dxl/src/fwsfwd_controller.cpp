@@ -132,7 +132,7 @@ class FWSFWDController : public rclcpp::Node
         subscription_jointcmd_ = this->create_subscription<std_msgs::msg::Float64MultiArray>("wcr/joint_cmd", 10, std::bind(&FWSFWDController::joint_cmd_callback, this, _1));
         publisher_ = this->create_publisher<sensor_msgs::msg::JointState>(this->get_parameter("joint_state_topic").as_string(), 10);
         publisher_odom_ = this->create_publisher<nav_msgs::msg::Odometry>(this->get_parameter("odom_topic").as_string(), 10);
-        odometry_reset_ = this->create_service<std_srvs::srv::Trigger>("reset_odometry", std::bind(&FWSFWDController::odom_reset, this, std::placeholders::_1, std::placeholders::_2));
+        odometry_reset_ = this->create_service<std_srvs::srv::Trigger>("wcr/reset_odometry", std::bind(&FWSFWDController::odom_reset, this, std::placeholders::_1, std::placeholders::_2));
         timer_ = this->create_wall_timer(2ms, std::bind(&FWSFWDController::joint_state_callback, this));
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
@@ -207,6 +207,11 @@ class FWSFWDController : public rclcpp::Node
         void odom_reset(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, const std::shared_ptr<std_srvs::srv::Trigger::Response> response) 
         {
             if (request){ //Avoiding unused_variable warning
+                const char * log = nullptr;
+                int32_t steering_angles[4] = {2048, 2048, 2048, 2048};
+                int32_t dynamixel_velocity[4] = {0, 0, 0, 0};
+                dxl_wb.syncWrite(kGoalPositionIndex, steering_motors_ids_, 4, steering_angles, 1, &log);
+                dxl_wb.syncWrite(kGoalVelocityIndex, driving_motors_ids_, 4, dynamixel_velocity  , 1, &log);
                 this->x_ = 0.0;
                 this->y_ = 0.0;
                 this->th_ = 0.0;

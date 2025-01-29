@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'square_wave_node = wcr_trajectory_generator.square_wave_node:main'
+            'square_wave_node = wcr_trajectory_generator.square_wave_node:main',
+            'linear_trajectory_node = wcr_trajectory_generator.linear_node:main',
         ],
     },
 )
