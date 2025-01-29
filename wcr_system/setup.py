@@ -28,7 +28,8 @@ setup(
             'thruster_joy_node = wcr_system.thruster_joy_node:main',
             'non_linear_controller = wcr_system.non_linear_controller:main',
             'marvelmind_pose_converter = wcr_system.marvelmind_pose_cnv:main',
-            'optitrack_help_node = wcr_system.optitrack_help_node:main'
+            'optitrack_help_node = wcr_system.optitrack_help_node:main',
+            'grid_scan = wcr_system.grid_scan:main'
         ],
     },
 )

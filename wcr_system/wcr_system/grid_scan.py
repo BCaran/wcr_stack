@@ -10,12 +10,13 @@ from std_msgs.msg import Float64MultiArray
 from geometry_msgs.msg import Twist
 import numpy as np
 from wcr_interfaces.msg import DesiredPoseTwist
+from std_srvs.srv import Trigger
 
 #Square trajectory parameters:
 x_amplitude = 0.3
-dy_amplitude = -0.1
+dy_amplitude = 0.1
 vx_amplitude = 0.05
-vy_amplitude = -0.05
+vy_amplitude = 0.05
 
 # Parameters for the custom wave pattern (x-t)
 x_duration = x_amplitude/vx_amplitude  # Duration of positive phase for x-t (seconds)
@@ -35,6 +36,11 @@ class GridScan(Node):
         self.current_pose_sub = self.create_subscription(Odometry, '/wcr/odom', self.odometry_callback, 10)
         self.desired_pose_twist_pub = self.create_publisher(DesiredPoseTwist, '/wcr/desired_pose_twist', 10)
         self.cmd_vel_pub = self.create_publisher(Twist, '/wcr/cmd_vel', 10)
+        self.cli = self.create_client(Trigger, '/wcr/reset_odometry')
+        self.req = Trigger.Request()
+        self.future = self.cli.call_async(self.req)
+        rclpy.spin_until_future_complete(self, self.future)
+        
 
         controller_time = self.create_timer(1/50, self.controller_callback)
 
@@ -53,19 +59,16 @@ class GridScan(Node):
         self.cmd_vel_c = Twist()
         self.x_w_ = [0.1125, -0.1125, -0.1125, 0.1125]
         self.y_w_ = [0.1125, 0.1125, -0.1125, -0.1125]
-        self.kp_x_ = 5
-        self.kp_y_ = 5
+        self.kp_x_ = 3
+        self.kp_y_ = 3
         self.kp_th_ = 2
-        self.ki_x_ = 0.0
-        self.ki_y_ = 0.0
-        self.ki_th_ = 0
         self.e_y_i_ = 0.0
         self.e_x_i_ = 0.0
         self.e_th_i_ = 0.0
-        self.start_time = self.get_clock().now().nanoseconds * 1e-9
 
         self.dy_repeats = 0
         self.last_dy_repeats = 0
+        self.start_time = self.get_clock().now().nanoseconds
         
     def controller_callback(self):
         if self.dy_repeats < repeats:
@@ -73,76 +76,135 @@ class GridScan(Node):
             cycle_time = self.current_time_s % cycle_duration  # Time within the current cycle
             #Ravno po X
             if 0 < cycle_time <= x_duration:
-                self.x_d_ = vx_amplitude * cycle_time
-                self.y_d_ = 0.0
-                self.vx_d_ = vx_amplitude
+                t = cycle_time
+                T = x_duration
+                #self.x_d_ = vx_amplitude * cycle_time
+                self.x_d_ = 10 * (t/T)**3 - 15 * (t/T)**4 + 6 * (t/T)**5
+                self.vx_d_ = (30 * (t/T)**2 - 60 * (t/T)**3 + 30 * (t/T)**4) / T
                 self.vy_d_ = 0.0
+                self.omega_d_ = 0.0
+
+                vx_c, vy_c, omega_c = self.calculate_controlled_cmd(x_d=self.x_d_, y_d=self.y_d_, th_d=self.th_d_, vx_d=self.vx_d_, vy_d=self.vy_d_, omega_d=self.omega_d_)
+                
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = vx_c
+                cmd_vel_msg.linear.y = vy_c
+                cmd_vel_msg.angular.z = omega_c
+                self.cmd_vel_pub.publish(cmd_vel_msg)
+
                 self.last_dy_repeats = self.dy_repeats
             #Pauza 1 sekundu
             elif x_duration < cycle_time <= x_duration + pause_duration:
-                self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude * 1e-3
+                self.vx_d_ = 0.0
+                self.vy_d_ = 0.0
+
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = 0.0
+                cmd_vel_msg.linear.y = vy_amplitude * 1e-5
+                cmd_vel_msg.angular.z = 0.0
+                self.cmd_vel_pub.publish(cmd_vel_msg)
             #Po y osi
             elif x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration:
-                self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude * (cycle_time - x_duration - pause_duration)
-                self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude
+                self.y_d_ = self.dy_repeats*dy_amplitude + vy_amplitude * (cycle_time - x_duration - pause_duration)
+                self.vx_d_ = 0.0
+                self.vy_d_ = vy_amplitude
+                vx_c, vy_c, omega_c = self.calculate_controlled_cmd(x_d=self.x_d_, y_d=self.y_d_, th_d=self.th_d_, vx_d=self.vx_d_, vy_d=self.vy_d_, omega_d=self.omega_d_)
+                
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = vx_c
+                cmd_vel_msg.linear.y = vy_c
+                cmd_vel_msg.angular.z = omega_c
+                self.cmd_vel_pub.publish(cmd_vel_msg)
             #Pauza 1 sekundu
             elif x_duration + pause_duration + y_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration:
-                self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                self.vx_d_ = 0.0
+                self.vy_d_ = 0.0
+
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = 0.0
+                cmd_vel_msg.linear.y = 0.0
+                cmd_vel_msg.angular.z = 0.0
+                self.cmd_vel_pub.publish(cmd_vel_msg)
                 if(self.dy_repeats == self.last_dy_repeats):
                     self.dy_repeats += 1.0
             #Unazad po X osi
             elif x_duration + pause_duration + y_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration:
-                self.desired_pose_twist_msg.pose.position.x = x_amplitude - vx_amplitude * (cycle_time - x_duration - pause_duration - y_duration - pause_duration)
-                self.desired_pose_twist_msg.twist.linear.x = -vx_amplitude
-                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                self.x_d_ = x_amplitude - vx_amplitude * (cycle_time - x_duration - pause_duration - y_duration - pause_duration)
+                self.vx_d_= -vx_amplitude
+                self.vy_d_ = 0.0
                 self.last_dy_repeats = self.dy_repeats
+
+                vx_c, vy_c, omega_c = self.calculate_controlled_cmd(x_d=self.x_d_, y_d=self.y_d_, th_d=self.th_d_, vx_d=self.vx_d_, vy_d=self.vy_d_, omega_d=self.omega_d_)
+                
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = vx_c
+                cmd_vel_msg.linear.y = vy_c
+                cmd_vel_msg.angular.z = omega_c
+                self.cmd_vel_pub.publish(cmd_vel_msg)
             #Pauza 1 sekundu
             elif x_duration + pause_duration + y_duration + pause_duration + x_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration:
-                self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude * 1e-3
+                self.vx_d_ = 0.0
+                self.vy_d_ = 0.0
+                
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = 0.0
+                cmd_vel_msg.linear.y = vy_amplitude * 1e-5
+                cmd_vel_msg.angular.z = 0.0
+                self.cmd_vel_pub.publish(cmd_vel_msg)
             #Po Y osi
             elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration:
-                self.desired_pose_twist_msg.pose.position.y = self.dy_repeats*dy_amplitude + vy_amplitude*(cycle_time - (x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration))
-                self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = vy_amplitude
+                self.y_d_ = self.dy_repeats*dy_amplitude + vy_amplitude*(cycle_time - (x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration))
+                self.vx_d_= 0.0
+                self.vy_d_ = vy_amplitude
+
+                vx_c, vy_c, omega_c = self.calculate_controlled_cmd(x_d=self.x_d_, y_d=self.y_d_, th_d=self.th_d_, vx_d=self.vx_d_, vy_d=self.vy_d_, omega_d=self.omega_d_)
+                
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = vx_c
+                cmd_vel_msg.linear.y = vy_c
+                cmd_vel_msg.angular.z = omega_c
+                self.cmd_vel_pub.publish(cmd_vel_msg)
+
             #Pauza 1 sekundu
             elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration + pause_duration:
-                self.desired_pose_twist_msg.twist.linear.x = 0.0
-                self.desired_pose_twist_msg.twist.linear.y = 0.0
+                self.vx_d_ = 0.0
+                self.vy_d_ = 0.0
+                
+                cmd_vel_msg = Twist()
+                cmd_vel_msg.linear.x = 0.0
+                cmd_vel_msg.linear.y = 0.0
+                cmd_vel_msg.angular.z = 0.0
+                self.cmd_vel_pub.publish(cmd_vel_msg)
                 if(self.dy_repeats == self.last_dy_repeats):
                     self.dy_repeats += 1.0
-        
-            self.pose_twist_publisher.publish(self.desired_pose_twist_msg)
         else:
-            self.desired_pose_twist_msg.header.stamp = self.get_clock().now().to_msg()
-            self.desired_pose_twist_msg.header.frame_id = "base_link"
-            self.pose_twist_publisher.publish(self.desired_pose_twist_msg)
-            self.desired_pose_twist_msg.twist.linear.x = 0.0
-            self.desired_pose_twist_msg.twist.linear.y = 0.0
+            cmd_vel_msg = Twist()
+            cmd_vel_msg.linear.x = 0.0
+            cmd_vel_msg.linear.y = 0.0
+            cmd_vel_msg.angular.z = 0.0
+            self.cmd_vel_pub.publish(cmd_vel_msg)
 
-        self.current_time_ = self.get_clock().now().nanoseconds / 1e9
-        dt = self.current_time_ - self.last_time_
-        self.normalized_time_ += dt
+        desired_pose_twist_msg = DesiredPoseTwist()
+        desired_pose_twist_msg.header.stamp = self.get_clock().now().to_msg()
+        desired_pose_twist_msg.header.frame_id = "odom"
+        
+        desired_pose_twist_msg.pose.position.x = self.x_d_
+        desired_pose_twist_msg.pose.position.y = self.y_d_
+        desired_pose_twist_msg.pose.orientation.z = 0.0
 
-        #Reference trajectory
-        x_d = desired_msg.pose.position.x
-        y_d = desired_msg.pose.position.y
-        th_d = euler_from_quaternion([desired_msg.pose.orientation.x, desired_msg.pose.orientation.y, desired_msg.pose.orientation.z, desired_msg.pose.orientation.w])
-        th_d  = th_d[2]
+        desired_pose_twist_msg.twist.linear.x = self.vx_d_
+        desired_pose_twist_msg.twist.linear.y = self.vy_d_
+        desired_pose_twist_msg.twist.angular.z = self.omega_d_
 
-        #Derivative of trajectory
-        dot_x_d = desired_msg.twist.linear.x
-        dot_y_d = desired_msg.twist.linear.y
-        dot_th_d = desired_msg.twist.angular.z
+        self.desired_pose_twist_pub.publish(desired_pose_twist_msg)
+        
 
+    def calculate_controlled_cmd(self, x_d, y_d, th_d, vx_d, vy_d, omega_d):
         #Rotated derivative of trajectory
-        rot_dot_x_d = dot_x_d * math.cos(th_d) + dot_y_d * math.sin(th_d)
-        rot_dot_y_d = -dot_x_d * math.sin(th_d) + dot_y_d * math.cos(th_d)
-        dot_x_d = rot_dot_x_d
-        dot_y_d = rot_dot_y_d
+        rot_vx_d = vx_d * math.cos(th_d) + vy_d * math.sin(th_d)
+        rot_vy_d = -vx_d * math.sin(th_d) + vy_d * math.cos(th_d)
+        vx_d = rot_vx_d
+        vy_d = rot_vy_d
 
         #Error
         e_x = (x_d - self.x_)*math.cos(self.th_) + (y_d - self.y_)*math.sin(self.th_)
@@ -163,8 +225,8 @@ class GridScan(Node):
         v_y_c = 0.0
         v_th_c = 0.0
         for i in range(4):
-            dot_x_i_d[i] = dot_x_d - self.y_w_[i] * dot_th_d
-            dot_y_i_d[i] = dot_y_d + self.x_w_[i] * dot_th_d
+            dot_x_i_d[i] = vx_d - self.y_w_[i] * omega_d
+            dot_y_i_d[i] = vy_d + self.x_w_[i] * omega_d
             dot_xy_d [i]= math.sqrt(math.pow(dot_x_i_d[i], 2) + math.pow(dot_y_i_d[i], 2))
             delta_i_d[i]= math.atan2(dot_y_i_d[i], dot_x_i_d[i])
             a[i] = dot_xy_d[i] * math.cos(delta_i_d[i]) + self.kp_x_*e_x - self.kp_th_ * self.y_w_[i]*e_th
@@ -177,13 +239,8 @@ class GridScan(Node):
             v_y_c += (math.sin(delta_c[i])/4)*(v_c[i])
             W_c[i] = (-self.y_w_[i]*math.cos(delta_c[i]) + self.x_w_[i]*math.sin(delta_c[i]))/(4*math.pow(self.x_w_[i], 2) + 4*math.pow(self.y_w_[i], 2))
             v_th_c +=  W_c[i]*v_c[i]
-        self.cmd_vel_c.linear.x = v_x_c
-        self.cmd_vel_c.linear.y = v_y_c
-        self.cmd_vel_c.angular.z = v_th_c
 
-        self.cmd_vel_pub.publish(self.cmd_vel_c)
-
-        self.last_time_ = self.get_clock().now().nanoseconds / 1e9       
+        return v_x_c, v_y_c, v_th_c
 
     def odometry_callback(self, msg):
         self.x_ = msg.pose.pose.position.x
