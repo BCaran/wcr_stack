@@ -12,15 +12,20 @@ import numpy as np
 from wcr_interfaces.msg import DesiredPoseTwist
 from std_srvs.srv import Trigger
 
+def compute_motion_time(distance, v_max):
+    peak_velocity_factor = 1.875  # Maximum of ds_quintic at peak
+    T = (distance / v_max) * peak_velocity_factor
+    return abs(T)
+
 #Square trajectory parameters:
-x_amplitude = 0.3
+x_amplitude = 1.0
 dy_amplitude = 0.1
-vx_amplitude = 0.05
-vy_amplitude = 0.05
+vx_amplitude = 0.1
+vy_amplitude = 0.025
 
 # Parameters for the custom wave pattern (x-t)
-x_duration = x_amplitude/vx_amplitude  # Duration of positive phase for x-t (seconds)
-y_duration = dy_amplitude/vy_amplitude
+x_duration = compute_motion_time(x_amplitude, vx_amplitude)  # Duration of positive phase for x-t (seconds)
+y_duration = compute_motion_time(dy_amplitude, vy_amplitude)
 pause_duration = 2  # Duration of pause for both pauses in x-t (seconds)
 repeats = 3  # Number of repetitions
 sampling_rate = 1000  # Samples per second
@@ -59,8 +64,8 @@ class GridScan(Node):
         self.cmd_vel_c = Twist()
         self.x_w_ = [0.1125, -0.1125, -0.1125, 0.1125]
         self.y_w_ = [0.1125, 0.1125, -0.1125, -0.1125]
-        self.kp_x_ = 3
-        self.kp_y_ = 3
+        self.kp_x_ = 5
+        self.kp_y_ = 5
         self.kp_th_ = 2
         self.e_y_i_ = 0.0
         self.e_x_i_ = 0.0
@@ -76,13 +81,13 @@ class GridScan(Node):
             cycle_time = self.current_time_s % cycle_duration  # Time within the current cycle
             #Ravno po X
             if 0 < cycle_time <= x_duration:
-                t = cycle_time
                 T = x_duration
-                #self.x_d_ = vx_amplitude * cycle_time
-                self.x_d_ = 10 * (t/T)**3 - 15 * (t/T)**4 + 6 * (t/T)**5
-                self.vx_d_ = (30 * (t/T)**2 - 60 * (t/T)**3 + 30 * (t/T)**4) / T
-                self.vy_d_ = 0.0
-                self.omega_d_ = 0.0
+                t = cycle_time
+                s_quintic = 10 * (t/T)**3 - 15 * (t/T)**4 + 6 * (t/T)**5
+                ds_quintic = (30 * (t/T)**2 - 60 * (t/T)**3 + 30 * (t/T)**4) / T
+
+                self.x_d_ = s_quintic * x_amplitude
+                self.vx_d_ = ds_quintic * x_amplitude                
 
                 vx_c, vy_c, omega_c = self.calculate_controlled_cmd(x_d=self.x_d_, y_d=self.y_d_, th_d=self.th_d_, vx_d=self.vx_d_, vy_d=self.vy_d_, omega_d=self.omega_d_)
                 
@@ -93,7 +98,7 @@ class GridScan(Node):
                 self.cmd_vel_pub.publish(cmd_vel_msg)
 
                 self.last_dy_repeats = self.dy_repeats
-            #Pauza 1 sekundu
+            #Pauza 
             elif x_duration < cycle_time <= x_duration + pause_duration:
                 self.vx_d_ = 0.0
                 self.vy_d_ = 0.0
@@ -105,9 +110,15 @@ class GridScan(Node):
                 self.cmd_vel_pub.publish(cmd_vel_msg)
             #Po y osi
             elif x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration:
-                self.y_d_ = self.dy_repeats*dy_amplitude + vy_amplitude * (cycle_time - x_duration - pause_duration)
+                T = y_duration
+                t = cycle_time - (x_duration + pause_duration)
+                s_quintic = 10 * (t/T)**3 - 15 * (t/T)**4 + 6 * (t/T)**5
+                ds_quintic = (30 * (t/T)**2 - 60 * (t/T)**3 + 30 * (t/T)**4) / T
+
+                self.y_d_ = self.dy_repeats*dy_amplitude + dy_amplitude*s_quintic
                 self.vx_d_ = 0.0
-                self.vy_d_ = vy_amplitude
+                self.vy_d_ = ds_quintic*dy_amplitude
+
                 vx_c, vy_c, omega_c = self.calculate_controlled_cmd(x_d=self.x_d_, y_d=self.y_d_, th_d=self.th_d_, vx_d=self.vx_d_, vy_d=self.vy_d_, omega_d=self.omega_d_)
                 
                 cmd_vel_msg = Twist()
@@ -115,7 +126,7 @@ class GridScan(Node):
                 cmd_vel_msg.linear.y = vy_c
                 cmd_vel_msg.angular.z = omega_c
                 self.cmd_vel_pub.publish(cmd_vel_msg)
-            #Pauza 1 sekundu
+            #Pauza
             elif x_duration + pause_duration + y_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration:
                 self.vx_d_ = 0.0
                 self.vy_d_ = 0.0
@@ -129,8 +140,14 @@ class GridScan(Node):
                     self.dy_repeats += 1.0
             #Unazad po X osi
             elif x_duration + pause_duration + y_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration:
-                self.x_d_ = x_amplitude - vx_amplitude * (cycle_time - x_duration - pause_duration - y_duration - pause_duration)
-                self.vx_d_= -vx_amplitude
+                T = x_duration
+                t = cycle_time - (x_duration + pause_duration + y_duration + pause_duration)
+
+                s_quintic = 10 * (t/T)**3 - 15 * (t/T)**4 + 6 * (t/T)**5
+                ds_quintic = (30 * (t/T)**2 - 60 * (t/T)**3 + 30 * (t/T)**4) / T
+
+                self.x_d_ = x_amplitude - x_amplitude*s_quintic
+                self.vx_d_= -ds_quintic*x_amplitude
                 self.vy_d_ = 0.0
                 self.last_dy_repeats = self.dy_repeats
 
@@ -153,10 +170,14 @@ class GridScan(Node):
                 self.cmd_vel_pub.publish(cmd_vel_msg)
             #Po Y osi
             elif x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration < cycle_time <= x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration:
-                self.y_d_ = self.dy_repeats*dy_amplitude + vy_amplitude*(cycle_time - (x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration))
-                self.vx_d_= 0.0
-                self.vy_d_ = vy_amplitude
+                T = y_duration
+                t = cycle_time - (x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration)
+                s_quintic = 10 * (t/T)**3 - 15 * (t/T)**4 + 6 * (t/T)**5
+                ds_quintic = (30 * (t/T)**2 - 60 * (t/T)**3 + 30 * (t/T)**4) / T
 
+                self.y_d_ = self.dy_repeats*dy_amplitude + dy_amplitude*s_quintic
+                self.vx_d_ = 0.0
+                self.vy_d_ = ds_quintic*dy_amplitude
                 vx_c, vy_c, omega_c = self.calculate_controlled_cmd(x_d=self.x_d_, y_d=self.y_d_, th_d=self.th_d_, vx_d=self.vx_d_, vy_d=self.vy_d_, omega_d=self.omega_d_)
                 
                 cmd_vel_msg = Twist()
