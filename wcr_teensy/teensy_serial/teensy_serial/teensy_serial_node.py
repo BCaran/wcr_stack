@@ -15,14 +15,14 @@ class TeensySerial(Node):
         print(serial.__version__)
         self.subscription = self.create_subscription(Int8,'/thruster_pwm', self.callback, 10)
         
-        self.serial = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=0.1)
+        self.serial = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=0.1)
 
     def callback(self, msg):
-    	thrusterPWM = msg.data
+        thrusterPWM = msg.data
         command = "THR" + str(thrusterPWM) + "\n"
-    	print(f"Sending:" + command)
-    	self.serial.write(bytes(command, 'utf-8'))
-    	print(self.serial.readline().decode())
+        print(f"Sending:" + command)
+        self.serial.write(bytes(command, 'utf-8'))
+        print(self.serial.readline().decode())
 
 def main(args=None):
     rclpy.init(args=args)
