@@ -27,7 +27,7 @@ vy_amplitude = 0.025
 x_duration = compute_motion_time(x_amplitude, vx_amplitude)  # Duration of positive phase for x-t (seconds)
 y_duration = compute_motion_time(dy_amplitude, vy_amplitude)
 pause_duration = 2  # Duration of pause for both pauses in x-t (seconds)
-repeats = 3  # Number of repetitions
+repeats = 6  # Number of repetitions
 sampling_rate = 1000  # Samples per second
 
 # Total duration of one cycle (positive, first pause, negative, second pause)
