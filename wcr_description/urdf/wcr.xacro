@@ -56,7 +56,7 @@
     <joint name="camera_joint" type="fixed">
         <parent link="chassis_link"/>
         <child link="t265_link"/>
-        <origin xyz="0.14885 0.00922 0.05459"/>
+        <origin xyz="0.14885 0.00922 0.06659"/>
     </joint>
 
 
@@ -68,7 +68,7 @@
     <joint name="camera_odom_joint" type="fixed">
         <parent link="chassis_link"/>
         <child link="t265_odom_frame"/>
-        <origin xyz="0.14885 0.00922 0.05459"/>
+        <origin xyz="0.14885 0.00922 0.06659"/>
     </joint>
 
 
@@ -100,7 +100,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://wcr_description/meshes/robotChassis.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find wcr_description)/meshes/robotChasissNew.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="gray"/>
         </visual>
