@@ -28,7 +28,7 @@ def generate_launch_description():
             }]),
         launch_ros.actions.Node(
             package='teleop_twist_joy', executable='teleop_node',
-            name='teleop_twist_joy_node', parameters=[config_filepath], remappings=[('/cmd_vel', '/wcr/cmd_vel')]),
+            name='teleop_twist_joy_node', parameters=[config_filepath], remappings=[('/cmd_vel', '/wcr/cmd_vel_joy')]),
         launch_ros.actions.Node(
             package='wcr_system', executable='thruster_joy_node'
         ),

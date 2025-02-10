@@ -40,7 +40,7 @@ class GridScan(Node):
         super().__init__('non_linear_controller')
         self.current_pose_sub = self.create_subscription(Odometry, '/wcr/odom', self.odometry_callback, 10)
         self.desired_pose_twist_pub = self.create_publisher(DesiredPoseTwist, '/wcr/desired_pose_twist', 10)
-        self.cmd_vel_pub = self.create_publisher(Twist, '/wcr/cmd_vel', 10)
+        self.cmd_vel_pub = self.create_publisher(Twist, '/wcr/cmd_vel_ctrl', 10)
         self.cli = self.create_client(Trigger, '/wcr/reset_odometry')
         self.req = Trigger.Request()
         self.future = self.cli.call_async(self.req)
@@ -271,14 +271,16 @@ class GridScan(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
-    grid_scan = GridScan()
-
-    rclpy.spin(grid_scan)
-
-    grid_scan.destroy_node()
-    rclpy.shutdown()
-
+    node = GridScan()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        cmd_vel_msg = Twist()
+        node.cmd_vel_pub.publish(cmd_vel_msg)
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
+

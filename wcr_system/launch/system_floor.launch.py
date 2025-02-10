@@ -14,6 +14,7 @@ def generate_launch_description():
 	robot_description_config = xacro.process_file('/home/wcr/wcr_ws/src/wcr_description/urdf/wcr.urdf.xacro')
 	fws_fwd_config = '/home/wcr/wcr_ws/src/wcr_system/config/fws_fwd_config.yaml'
 	bno055_config = '/home/wcr/wcr_ws/src/wcr_system/config/bno055_params_i2c.yaml'
+	twist_mux_params = os.path.join(get_package_share_directory('wcr_system'),'config', 'wcr_twist_mux_topics.yaml')
 
 	return LaunchDescription([
 		Node(
@@ -47,6 +48,14 @@ def generate_launch_description():
                 {"robot_description": robot_description_config.toxml(), "publish_frequency": 50.0}],
             remappings=[('/joint_states', '/wcr/joint_states')]
             ),
+
+		Node(
+            package='twist_mux',
+            executable='twist_mux',
+            output='screen',
+            remappings={('/cmd_vel_out', '/wcr/cmd_vel')},
+            parameters=[twist_mux_params]
+        ),
 
 		realsense_t265_launch,
 		ps4_joystick_launch
