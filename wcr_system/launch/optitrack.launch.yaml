@@ -1,7 +1,7 @@
 launch:
 - arg:
     name: "server"
-    default: "192.168.1.35"
+    default: "192.168.1.236"
 - arg:
     name: "port"
     default: "3883"
@@ -20,7 +20,3 @@ launch:
     -
       name: "port"
       value: "$(var port)"
-
-- node:
-    pkg: "wcr_system"
-    exec: "optitrack_help_node"

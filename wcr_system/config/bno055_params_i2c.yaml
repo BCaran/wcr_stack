@@ -1,30 +1,3 @@
-# Copyright 2021 AUTHORS
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-#    * Redistributions of source code must retain the above copyright
-#      notice, this list of conditions and the following disclaimer.
-#
-#    * Redistributions in binary form must reproduce the above copyright
-#      notice, this list of conditions and the following disclaimer in the
-#      documentation and/or other materials provided with the distribution.
-#
-#    * Neither the name of the AUTHORS nor the names of its
-#      contributors may be used to endorse or promote products derived from
-#      this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
 
 # Example parameters for an I2C connection to the BNO055 motion sensor.
 bno055:
@@ -38,14 +11,14 @@ bno055:
     frame_id: "imu_link"
     operation_mode: 0x0C
     placement_axis_remap: "P0"
-    acc_factor: 100.0
+    acc_factor: 1000.0
     mag_factor: 16000000.0
-    gyr_factor: 900.0
+    gyr_factor: 708.0
     grav_factor: 100.0
     set_offsets: false # set to true to use offsets below
-    offset_acc: [0xFFEC, 0x00A5, 0xFFE8]
-    offset_mag: [0xFFB4, 0xFE9E, 0x027D]
-    offset_gyr: [0x0002, 0xFFFF, 0xFFFF]
+    offset_acc: [0x60, 0x13, 0xFFED]
+    offset_mag: [0xDE, 0xB6, 0xFE82]
+    offset_gyr: [0x2, 0xFFFE, 0x0]
     ## Sensor standard deviation [x,y,z]
     ## Used to calculate covariance matrices
     ## defaults are used if parameters below are not provided

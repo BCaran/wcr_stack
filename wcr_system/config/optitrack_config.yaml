@@ -1,6 +1,6 @@
 /vrpn_mocap/client_node:
   ros__parameters:
-    server: 192.168.1.135
+    server: 192.168.1.236
     port: 3883
     frame_id: world
     update_freq: 100.
