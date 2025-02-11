@@ -20,3 +20,7 @@ launch:
     -
       name: "port"
       value: "$(var port)"
+
+- node:
+    pkg: wcr_system
+    exec: optitrack_help_node
