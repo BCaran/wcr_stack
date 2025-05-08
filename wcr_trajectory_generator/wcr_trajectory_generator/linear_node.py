@@ -3,9 +3,9 @@ from rclpy.node import Node
 from wcr_interfaces.msg import DesiredPoseTwist
 import numpy as np
 
-use_quintic_scaling = True
+use_quintic_scaling = False
 
-line_angle = np.deg2rad(0.0)
+line_angle = np.deg2rad(90.0)
 line_length = 1.0
 vx_amplitude = 0.05
 vy_amplitude = 0.05

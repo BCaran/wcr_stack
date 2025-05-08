@@ -28,11 +28,11 @@ def generate_launch_description():
 			parameters = [bno055_config]
 		),
 
-		#Node(
-        #    package='tf2_ros',
-        #    executable='static_transform_publisher',
-        #    arguments = ['0', '0', '0', '0', '0', '0', 'world', 'odom']
-        #),
+		Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            arguments = ['0', '0', '0', '0', '0', '0', 'world', 'odom']
+        ),
 
 		#Node(
         #    package='tf2_ros',

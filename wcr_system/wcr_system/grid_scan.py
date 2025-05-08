@@ -7,7 +7,7 @@ import rclpy.time
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64MultiArray
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, PoseStamped
 import numpy as np
 from wcr_interfaces.msg import DesiredPoseTwist
 from std_srvs.srv import Trigger
@@ -34,11 +34,17 @@ sampling_rate = 1000  # Samples per second
 cycle_duration = x_duration + pause_duration + y_duration + pause_duration + x_duration + pause_duration + y_duration + pause_duration
 total_duration = cycle_duration * repeats
 
+use_optitrack_feedback = False
+
 
 class GridScan(Node):
     def __init__(self):
         super().__init__('non_linear_controller')
-        self.current_pose_sub = self.create_subscription(Odometry, '/wcr/odom', self.odometry_callback, 10)
+        if (use_optitrack_feedback == True):
+            self.current_pose_sub = self.create_subscription(PoseStamped, '/optitrack/wcr/pose', self.odometry_callback, 10)
+        else:
+            self.current_pose_sub = self.create_subscription(Odometry, '/wcr/odom', self.odometry_callback, 10)
+        
         self.desired_pose_twist_pub = self.create_publisher(DesiredPoseTwist, '/wcr/desired_pose_twist', 10)
         self.cmd_vel_pub = self.create_publisher(Twist, '/wcr/cmd_vel_ctrl', 10)
         self.cli = self.create_client(Trigger, '/wcr/reset_odometry')
@@ -264,10 +270,16 @@ class GridScan(Node):
         return v_x_c, v_y_c, v_th_c
 
     def odometry_callback(self, msg):
-        self.x_ = msg.pose.pose.position.x
-        self.y_ = msg.pose.pose.position.y
-        self.th_ = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
-        self.th_  = self.th_ [2]
+        if (use_optitrack_feedback == True):
+            self.x_ = msg.pose.position.x
+            self.y_ = msg.pose.position.y
+            self.th_ = euler_from_quaternion([msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w])
+            self.th_  = self.th_ [2]
+        else:
+            self.x_ = msg.pose.pose.position.x
+            self.y_ = msg.pose.pose.position.y
+            self.th_ = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+            self.th_  = self.th_ [2]
 
 def main(args=None):
     rclpy.init(args=args)

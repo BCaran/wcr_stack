@@ -6,6 +6,7 @@
 #include "std_msgs/msg/string.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
 #include "geometry_msgs/msg/twist.hpp"
+//#include "geometry_msgs/msg/posewithcovariance.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "tf2/LinearMath/Quaternion.h"
@@ -69,7 +70,8 @@ class FWSFWDController : public rclcpp::Node
 
         this->declare_parameter("cmd_vel_topic", "/wcr/cmd_vel");
         this->declare_parameter("joint_state_topic", "/wcr/joint_states");
-        this->declare_parameter("odom_topic", "/wcr/odom");      
+        this->declare_parameter("odom_topic", "/wcr/odom");    
+        this->declare_parameter("pose_topic", "/wcr/pose");    
 
         this->declare_parameter("dxl_usb_port", "/dev/ttyUSB0");
         this->declare_parameter("dynamixel_limit_max_velocity", 210);
@@ -132,6 +134,7 @@ class FWSFWDController : public rclcpp::Node
         subscription_jointcmd_ = this->create_subscription<std_msgs::msg::Float64MultiArray>("wcr/joint_cmd", 10, std::bind(&FWSFWDController::joint_cmd_callback, this, _1));
         publisher_ = this->create_publisher<sensor_msgs::msg::JointState>(this->get_parameter("joint_state_topic").as_string(), 10);
         publisher_odom_ = this->create_publisher<nav_msgs::msg::Odometry>(this->get_parameter("odom_topic").as_string(), 10);
+        //publisher_pose_ = this->create_publisher<nav_msgs::msg::PoseWithCovariance>(this->get_parameter("pose_topic").as_string(), 10);
         odometry_reset_ = this->create_service<std_srvs::srv::Trigger>("wcr/reset_odometry", std::bind(&FWSFWDController::odom_reset, this, std::placeholders::_1, std::placeholders::_2));
         timer_ = this->create_wall_timer(2ms, std::bind(&FWSFWDController::joint_state_callback, this));
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
@@ -201,6 +204,8 @@ class FWSFWDController : public rclcpp::Node
         float x_ = 0.0;
         float y_ = 0.0;
         float th_ = 0.0;
+        float culmulative_x_ = 0.0;
+        float culmulative_y_ = 0.0;
         rclcpp::Time odom_current_time_;
         rclcpp::Time odom_last_time_;
 
@@ -410,9 +415,16 @@ class FWSFWDController : public rclcpp::Node
             odometry.pose.pose.orientation.z = quat.z();
             odometry.pose.pose.orientation.w = quat.w();
 
+            this->culmulative_x_ += abs(v_x)*dt;
+            this->culmulative_y_ += abs(v_y)*dt;
+
+            odometry.pose.covariance[0] = 0.0002*culmulative_x_ + 0.002 * culmulative_y_;
+            odometry.pose.covariance[7] = 0.0002*culmulative_y_ + 0.002 * culmulative_x_;
+            odometry.pose.covariance[35] = 0.001*culmulative_x_ + 0.001 * culmulative_y_;
+
             //Pose covariance
             for(int i = 0; i<36; i++){
-                odometry.pose.covariance[i] = odometry_pose_covariance_[i];
+            //    odometry.pose.covariance[i] = odometry_pose_covariance_[i];
                 odometry.twist.covariance[i] = odometry_twist_covariance_[i];
             }
             odometry.twist.twist.linear.x = v_x;
@@ -421,6 +433,7 @@ class FWSFWDController : public rclcpp::Node
             odometry.twist.twist.angular.x = 0.0;
             odometry.twist.twist.angular.y = 0.0;
             odometry.twist.twist.angular.z = omega;
+            
 
             t.header.stamp = this->get_clock()->now();
             t.header.frame_id = "odom";

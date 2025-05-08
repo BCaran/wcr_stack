@@ -5,6 +5,9 @@ launch:
 - arg:
     name: "port"
     default: "3883"
+-arg:
+    name: "update_freq"
+    default: "120"
 
 - node:
     pkg: "vrpn_mocap"
@@ -21,6 +24,6 @@ launch:
       name: "port"
       value: "$(var port)"
 
-- node:
-    pkg: wcr_system
-    exec: optitrack_help_node
+# - node:
+#     pkg: wcr_system
+#     exec: optitrack_help_node
