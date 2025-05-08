@@ -12,7 +12,7 @@ class TrhusterJoyNode(Node):
         self.joy_subscribtion = self.create_subscription(Joy, 'joy', self.joy_callback, 10)
         self.joy_subscribtion 
 
-        self.thr_publihser = self.create_publisher(Int8, 'thruster_pwm', 10)
+        self.thr_publihser = self.create_publisher(Int8, '/wcr/thruster_pwm', 10)
         self.edf_publisher = self.create_publisher(Float64, 'commands/motor/duty_cycle', 10)
 
         self.thruster_pwm = Int8()
