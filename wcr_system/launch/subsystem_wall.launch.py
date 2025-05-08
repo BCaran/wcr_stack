@@ -17,7 +17,8 @@ def generate_launch_description():
         Node(
 			package = 'vesc_driver',
 			executable = 'vesc_driver_node',
-			parameters = [vesc_config]
+			parameters = [vesc_config],
+			remappings=[('/commands/motor/duty_cycle', '/wcr/edf/dutty_cycle')]
 		),
 
     ])
