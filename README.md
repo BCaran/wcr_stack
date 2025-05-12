@@ -12,6 +12,10 @@ On PC we only need _urdf_ of the robot for visualization in _rviz2_
 cd ..
 colcon build --packages-select wcr_description
 ```
+For robot visualization and _urdf_ check we use only _robot_state_publisher_, _joint_state_publisher_gui_ and robot's _urdf_
+```
+ros2 launch wcr_description display_dummy.launch.py
+```
 
 # Getting started on _wcr_
 ```
