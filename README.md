@@ -19,7 +19,11 @@ ros2 launch wcr_description display_dummy.launch.py
 ```
 ![Screenshot from 2025-05-12 16-15-52](https://github.com/user-attachments/assets/294211be-3e27-4112-898b-1a929239729b)
 
-
+**IF THE ROBOT IS RUNNING** we can use 
+```
+ros2 launch wcr_description display.launch.py
+```
+to display states from the robot.
 # Getting started on _wcr_
 ```
 mkdir -p wcr/src
