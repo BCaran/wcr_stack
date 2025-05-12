@@ -20,8 +20,8 @@ ros2 launch wcr_description display_dummy.launch.py
 <img
   src="https://github.com/user-attachments/assets/294211be-3e27-4112-898b-1a929239729b"
   alt="Robot URDF visualization"
-  width="600"
-  height="400"
+  width="768"
+  height="432"
 />
 
 **IF THE ROBOT IS RUNNING** we can use 
