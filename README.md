@@ -17,7 +17,12 @@ For robot visualization and _urdf_ check we use only _robot_state_publisher_, _j
 ```
 ros2 launch wcr_description display_dummy.launch.py
 ```
-![Screenshot from 2025-05-12 16-15-52](https://github.com/user-attachments/assets/294211be-3e27-4112-898b-1a929239729b)
+<img
+  src="https://github.com/user-attachments/assets/294211be-3e27-4112-898b-1a929239729b"
+  alt="Robot URDF visualization"
+  width="600"
+  height="400"
+/>
 
 **IF THE ROBOT IS RUNNING** we can use 
 ```
