@@ -1,7 +1,7 @@
 # wcr_stack
 Stack for Wall climbing robot with 4WIS4WID kinematic structure
 
-# Getting started
+# Getting started on _wcr_
 ```
 mkdir -p wcr/src
 cd wcr/src
