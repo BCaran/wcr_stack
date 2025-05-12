@@ -37,9 +37,8 @@ cd ..
 rosdep install -i --from-path src --rosdistro humble -y
 colcon build
 ```
-IMPORTANT! \
+**IMPORTANT!** \
 Before following commands, make sure that permissions have been added to the USB ports for _Dynamixel_, _VESC_ and _Teensy_
-```
-sudo usermod -aG dialout <linux_account>
-```
+
+System launching starts nodes for driving robot and odometry, IMU (_BNO055_ or _olixSense™ IMU_), _RealSense T265_ and _PS4_ joystick.
 
