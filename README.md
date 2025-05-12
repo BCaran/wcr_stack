@@ -40,5 +40,11 @@ colcon build
 **IMPORTANT!** \
 Before following commands, make sure that permissions have been added to the USB ports for _Dynamixel_, _VESC_ and _Teensy_
 
-System launching starts nodes for driving robot and odometry, IMU (_BNO055_ or _olixSense™ IMU_), _RealSense T265_ and _PS4_ joystick.
-
+System launch starts nodes for driving robot and odometry, IMU (_BNO055_ or _olixSense™ IMU_), _RealSense T265_ and _PS4_ joystick.
+```
+ros2 launch wcr_system system_floor.launch.py
+```
+Subsystem launch starts nodes for controlling electric duct fan for adhesion system and thruster motors control.
+```
+ros2 launch wcr_system subsystem_wall.launch.py
+```
