@@ -1,6 +1,18 @@
 # wcr_stack
 Stack for Wall climbing robot with 4WIS4WID kinematic structure
 
+# Getting started on companion PC
+```
+mkdir -p wcr_pc/src
+cd wcr/src
+git clone https://github.com/BCaran/wcr_stack.git
+```
+On PC we only need _urdf_ of the robot for visualization in _rviz2_
+```
+cd ..
+colcon build --packages-select wcr_description
+```
+
 # Getting started on _wcr_
 ```
 mkdir -p wcr/src
