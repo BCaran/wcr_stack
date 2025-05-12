@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import String
 
 
@@ -9,7 +9,7 @@ class OptitrackTransformer(Node):
 
     def __init__(self):
         super().__init__('optitrack_help_node')
-        self.subscription = self.create_subscription(String,'topic',self.listener_callback,10)
+        self.subscription = self.create_subscription(PoseStamped, '/optitrack/wcr/pose')
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
@@ -19,7 +19,7 @@ class OptitrackTransformer(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = MinimalSubscriber()
+    minimal_subscriber = OptitrackTransformer()
 
     rclpy.spin(minimal_subscriber)
     

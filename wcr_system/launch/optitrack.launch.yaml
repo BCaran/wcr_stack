@@ -5,10 +5,9 @@ launch:
 - arg:
     name: "port"
     default: "3883"
--arg:
+- arg:
     name: "update_freq"
     default: "120"
-
 - node:
     pkg: "vrpn_mocap"
     namespace: "optitrack"

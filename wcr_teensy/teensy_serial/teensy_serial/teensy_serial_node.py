@@ -13,7 +13,7 @@ class TeensySerial(Node):
     def __init__(self):
         super().__init__("teensy_serial_node")
         print(serial.__version__)
-        self.subscription = self.create_subscription(Int8,'/wcr/thruster_pwm', self.callback, 10)
+        self.subscription = self.create_subscription(Int8,'/wcr/thruster/pwm', self.callback, 10)
         
         self.serial = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=0.1)
 
