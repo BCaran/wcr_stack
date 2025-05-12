@@ -11,6 +11,7 @@ On PC we only need _urdf_ of the robot for visualization in _rviz2_
 ```
 cd ..
 colcon build --packages-select wcr_description
+source install/setup.bash
 ```
 For robot visualization and _urdf_ check we use only _robot_state_publisher_, _joint_state_publisher_gui_ and robot's _urdf_
 ```
