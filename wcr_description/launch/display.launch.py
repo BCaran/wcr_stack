@@ -6,7 +6,6 @@ from launch_ros.actions import Node
 
 import xacro
 
-
 def generate_launch_description():
     robot_name = "wcr"
     package_name = "wcr_description"
