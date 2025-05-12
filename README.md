@@ -24,11 +24,10 @@ ros2 launch wcr_description display_dummy.launch.py
   height="360"
 />
 
-**IF THE ROBOT IS RUNNING** we can use 
+**IF THE ROBOT IS RUNNING** we can use following _.launch_ to display robot's states.
 ```
 ros2 launch wcr_description display.launch.py
 ```
-to display states from the robot.
 # Getting started on _wcr_
 ```
 mkdir -p wcr/src
