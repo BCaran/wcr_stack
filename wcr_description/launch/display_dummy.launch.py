@@ -11,7 +11,7 @@ def generate_launch_description():
     robot_name = "wcr"
     package_name = "wcr_description"
     rviz_config = os.path.join(get_package_share_directory(
-        package_name), "rviz", "wcr.rviz")
+        package_name), "rviz", "wcr_dummy.rviz")
     robot_description = os.path.join(get_package_share_directory(
         package_name), "urdf", "wcr.urdf.xacro")
     robot_description_config = xacro.process_file(robot_description)
