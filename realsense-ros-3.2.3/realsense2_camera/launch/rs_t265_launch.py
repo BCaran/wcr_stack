@@ -44,7 +44,7 @@ local_parameters = [{'name': 'camera_name', 'default': 't265', 'description': 'c
                     {'name': 'tracking_module.enable_pose_jumping', 'default': 'false', 'description': 'Enable jumping pose, maybe introduce drift if false'},
                     {'name': 'publish_odom_tf', 'default': 'false', 'description': 'Enable publishing T265 pose as TF'},
                     {'name': 'calib_odom_file',              'default': '/home/wcr/wcr_ws/src/realsense-ros-3.2.3/realsense2_camera/config/wcr_odometry_file.json', 'description': "''"},
-                    {'name': 'topic_odom_in',                'default': '/wcr/odom', 'description': 'topic for T265 wheel odometry'},
+                    {'name': 'topic_odom_in',                'default': "''", 'description': 'topic for T265 wheel odometry'},
                    ]
 
 def generate_launch_description():
