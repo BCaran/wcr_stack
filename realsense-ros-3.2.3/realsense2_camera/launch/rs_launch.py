@@ -30,7 +30,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'enable_pointcloud',            'default': 'false', 'description': 'enable pointcloud'},
                            {'name': 'unite_imu_method',             'default': 'linear_interpolation', 'description': '[copy|linear_interpolation]'},
                            {'name': 'json_file_path',               'default': "''", 'description': 'allows advanced configuration'},
-                           {'name': 'log_level',                    'default': 'info', 'description': 'debug log level [DEBUG|INFO|WARN|ERROR|FATAL]'},
+                           {'name': 'log_level',                    'default': 'INFO', 'description': 'debug log level [DEBUG|INFO|WARN|ERROR|FATAL]'},
                            {'name': 'output',                       'default': 'screen', 'description': 'pipe node output [screen|log]'},
                            {'name': 'depth_width',                  'default': '-1', 'description': 'depth image width'},
                            {'name': 'depth_height',                 'default': '-1', 'description': 'depth image height'},
@@ -76,7 +76,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'allow_no_texture_points',      'default': 'false', 'description': ''},
                            {'name': 'ordered_pc',                   'default': 'false', 'description': ''},
                            {'name': 'calib_odom_file',              'default': "''", 'description': "''"},
-                           {'name': 'topic_odom_in',                'default': "''", 'description': 'topic for T265 wheel odometry'},
+                           {'name': 'topic_odom_in',                'default': 'wcr/odom', 'description': 'topic for T265 wheel odometry'},
                            {'name': 'tf_publish_rate',              'default': '0.0', 'description': 'Rate of publishing static_tf'},
                            {'name': 'diagnostics_period',           'default': '0.0', 'description': 'Rate of publishing diagnostics. 0=Disabled'},
                            {'name': 'rosbag_filename',              'default': "''", 'description': 'A realsense bagfile to run from as a device'},
@@ -100,7 +100,7 @@ def set_configurable_parameters(parameters):
     return dict([(param['name'], LaunchConfiguration(param['name'])) for param in parameters])
 
 def generate_launch_description():
-    log_level = 'info'
+    log_level = 'debug'
     if (os.getenv('ROS_DISTRO') == "dashing") or (os.getenv('ROS_DISTRO') == "eloquent"):
         return LaunchDescription(declare_configurable_parameters(configurable_parameters) + [
             # Realsense

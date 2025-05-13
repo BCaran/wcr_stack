@@ -9,8 +9,10 @@ T265RealsenseNode::T265RealsenseNode(rclcpp::Node& node,
                                      _wo_snr(dev.first<rs2::wheel_odometer>()),
                                      _use_odom_in(false) 
                                      {
-                                         _monitor_options = {RS2_OPTION_ASIC_TEMPERATURE, RS2_OPTION_MOTION_MODULE_TEMPERATURE};
-                                         initializeOdometryInput();
+                                        _monitor_options = {RS2_OPTION_ASIC_TEMPERATURE, RS2_OPTION_MOTION_MODULE_TEMPERATURE};
+                                        initializeOdometryInput();
+                                        setupSubscribers();
+
                                      }
 
 void T265RealsenseNode::initializeOdometryInput()
@@ -21,6 +23,10 @@ void T265RealsenseNode::initializeOdometryInput()
     {
         ROS_INFO("No calib_odom_file. No input odometry accepted.");
         return;
+    }
+    else
+    {
+        ROS_INFO("Input odometry file accepted!");
     }
     std::ifstream calibrationFile(calib_odom_file);
     if (!calibrationFile)
@@ -38,6 +44,7 @@ void T265RealsenseNode::initializeOdometryInput()
         throw std::runtime_error("Format error in calibration_odometry file" );
     }
     _use_odom_in = true;
+    ROS_INFO("Odom in declared");
 }
 
 bool T265RealsenseNode::toggleSensors(bool /*enabled*/, std::string& /*msg*/)
@@ -53,15 +60,19 @@ void T265RealsenseNode::publishTopics()
 }
 
 void T265RealsenseNode::setupSubscribers()
-{
-    if (!_use_odom_in) return;
+{   
+    if (_use_odom_in)
+    {
+        std::string topic_odom_in;
+        setNgetNodeParameter(topic_odom_in, "topic_odom_in", DEFAULT_TOPIC_ODOM_IN);
+        ROS_INFO_STREAM("Subscribing to in_odom topic: " << topic_odom_in);
 
-    std::string topic_odom_in;
-    setNgetNodeParameter(topic_odom_in, "topic_odom_in", DEFAULT_TOPIC_ODOM_IN);
-
-    ROS_INFO_STREAM("Subscribing to in_odom topic: " << topic_odom_in);
-
-    _odom_subscriber = _node.create_subscription<nav_msgs::msg::Odometry>(topic_odom_in, 1, std::bind(&T265RealsenseNode::odom_in_callback, this, std::placeholders::_1));
+        _odom_subscriber = _node.create_subscription<nav_msgs::msg::Odometry>(topic_odom_in, 1, std::bind(&T265RealsenseNode::odom_in_callback, this, std::placeholders::_1));
+    }
+    else
+    {
+        ROS_WARN("Subscribing to odom topic failed!");
+    }
 }
 
 void T265RealsenseNode::odom_in_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
