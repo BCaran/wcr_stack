@@ -23,6 +23,7 @@ setup(
             'square_wave_node = wcr_trajectory_generator.square_wave_node:main',
             'linear_trajectory_node = wcr_trajectory_generator.linear_node:main',
             'circular_trajectory_node = wcr_trajectory_generator.circle_node:main',
+            'lissajous_trajectory_node = wcr_trajectory_generator.lissajous_node:main',
         ],
     },
 )
