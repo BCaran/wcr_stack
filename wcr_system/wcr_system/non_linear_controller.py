@@ -7,7 +7,7 @@ import rclpy.time
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64MultiArray
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, PoseStamped
 import numpy as np
 from wcr_interfaces.msg import DesiredPoseTwist
 
@@ -17,6 +17,7 @@ class NonLinearController(Node):
         super().__init__('non_linear_controller')
         self.pose_sub = self.create_subscription(Odometry, '/wcr/odom', self.odometry_callback, 10)
         self.desired_pose_twist_sub = self.create_subscription(DesiredPoseTwist, '/wcr/desired_pose_twist', self.controller_callback, 10)
+        self.dessired_pose_pub = self.create_publisher(PoseStamped, '/wcr/desired_pose_debug', 10)
         self.joint_cmd_pub = self.create_publisher(Float64MultiArray, '/wcr/joint_cmd', 10)
         self.cmd_vel_pub = self.create_publisher(Twist, '/wcr/cmd_vel', 10)
         self.declare_parameter("start_using_srv", False)
@@ -60,7 +61,15 @@ class NonLinearController(Node):
         y_d = desired_msg.pose.position.y
         th_d = euler_from_quaternion([desired_msg.pose.orientation.x, desired_msg.pose.orientation.y, desired_msg.pose.orientation.z, desired_msg.pose.orientation.w])
         th_d  = th_d[2]
-
+        self.pose_debug_msg = PoseStamped()
+        self.pose_debug_msg.header.frame_id = "odom"
+        self.pose_debug_msg.pose.position.x = x_d
+        self.pose_debug_msg.pose.position.y = y_d
+        self.pose_debug_msg.pose.orientation.x = desired_msg.pose.orientation.x
+        self.pose_debug_msg.pose.orientation.y = desired_msg.pose.orientation.y
+        self.pose_debug_msg.pose.orientation.z = desired_msg.pose.orientation.z
+        self.pose_debug_msg.pose.orientation.w = desired_msg.pose.orientation.w
+        
         #Derivative of trajectory
         dot_x_d = desired_msg.twist.linear.x
         dot_y_d = desired_msg.twist.linear.y
@@ -75,7 +84,13 @@ class NonLinearController(Node):
         #Error
         e_x = (x_d - self.x_)*math.cos(self.th_) + (y_d - self.y_)*math.sin(self.th_)
         e_y = -(x_d - self.x_)*math.sin(self.th_) + (y_d - self.y_)*math.cos(self.th_)
+        th_d = (th_d + 2*np.pi) % (2*np.pi)
+        self.th_ = (self.th_ + 2*np.pi) % (2*np.pi)
         e_th = th_d - self.th_
+        
+        self.get_logger().info("Theta_d: %f" % th_d)
+        self.get_logger().info("Theta: %f" % self.th_)
+        self.get_logger().info("Error Theta: %f" % e_th)
         
         dot_x_i_d = [0.0, 0.0, 0.0, 0.0]
         dot_y_i_d = [0.0, 0.0, 0.0, 0.0]
@@ -105,11 +120,13 @@ class NonLinearController(Node):
             v_y_c += (math.sin(delta_c[i])/4)*(v_c[i])
             W_c[i] = (-self.y_w_[i]*math.cos(delta_c[i]) + self.x_w_[i]*math.sin(delta_c[i]))/(4*math.pow(self.x_w_[i], 2) + 4*math.pow(self.y_w_[i], 2))
             v_th_c +=  W_c[i]*v_c[i]
+            
         self.cmd_vel_c.linear.x = v_x_c
         self.cmd_vel_c.linear.y = v_y_c
         self.cmd_vel_c.angular.z = v_th_c
 
         self.cmd_vel_pub.publish(self.cmd_vel_c)
+        self.dessired_pose_pub.publish(self.pose_debug_msg)
 
         self.last_time_ = self.get_clock().now().nanoseconds / 1e9       
 

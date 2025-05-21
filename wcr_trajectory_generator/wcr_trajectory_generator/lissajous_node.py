@@ -6,14 +6,15 @@ from geometry_msgs.msg import PoseStamped
 import numpy as np
 from tf_transformations import quaternion_from_euler
 
-v_max = 0.05
+v_max = 0.1
 duration = 2*np.pi/v_max
 a = 1.0 #horizontal amplitude
 b = 0.5 #vertical amplitude
-omega = 0.05#base angular velocity
+omega = v_max #base angular velocity
 phase = 0.0 #phase offset for x
 sampling_rate = 1000
-angle_follow_path = False
+angle_follow_path = True
+
 
 
 class CircularTrajectoryNode(Node):
@@ -25,7 +26,7 @@ class CircularTrajectoryNode(Node):
         
         self.timer = self.create_timer(1/sampling_rate, self.trajectory_callback)
         self.calculate_path()
-        self.path_timer = self.create_timer(1.0, self.publish_total_path)
+        self.path_timer = self.create_timer(10.0, self.publish_total_path)
         self.desired_pose_twist_msg = DesiredPoseTwist()
         
         self.get_logger().info("a: %f" % a)
@@ -40,6 +41,7 @@ class CircularTrajectoryNode(Node):
             
         self.start_time = self.get_clock().now().nanoseconds
         self.current_time = (self.get_clock().now().nanoseconds - self.start_time) * 1e-9
+        
         
         
                 
@@ -106,6 +108,20 @@ class CircularTrajectoryNode(Node):
             self.desired_pose_twist_msg.pose.position.y = b * np.sin(2 * omega * t)
             self.desired_pose_twist_msg.twist.linear.x = a * omega * np.cos(omega * t + phase)
             self.desired_pose_twist_msg.twist.linear.y = 2 * b * omega * np.cos(2 * omega * t)
+            
+            if angle_follow_path == True:
+                theta = np.arctan2(self.desired_pose_twist_msg.twist.linear.y, self.desired_pose_twist_msg.twist.linear.x)
+                q = quaternion_from_euler(0.0, 0.0, float(theta))
+                self.desired_pose_twist_msg.pose.orientation.x = q[0]
+                self.desired_pose_twist_msg.pose.orientation.y = q[1]
+                self.desired_pose_twist_msg.pose.orientation.z = q[2]
+                self.desired_pose_twist_msg.pose.orientation.w = q[3]
+            else:
+                q = quaternion_from_euler(0.0, 0.0, 0.0)
+                self.desired_pose_twist_msg.pose.orientation.x = q[0]
+                self.desired_pose_twist_msg.pose.orientation.y = q[1]
+                self.desired_pose_twist_msg.pose.orientation.z = q[2]
+                self.desired_pose_twist_msg.pose.orientation.w = q[3]
         else:
             self.desired_pose_twist_msg.twist.linear.x = 0.0
             self.desired_pose_twist_msg.twist.linear.y = 0.0

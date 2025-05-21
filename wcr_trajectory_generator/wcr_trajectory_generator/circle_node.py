@@ -10,7 +10,7 @@ radius = 1.0
 angular_velocity = (2 * np.pi)/80
 duration = 80 #s
 sampling_rate = 1000  # Samples per second
-angle_follow_path = False
+angle_follow_path = True
 use_ccw = False
 
 class CircularTrajectoryNode(Node):
@@ -111,14 +111,25 @@ class CircularTrajectoryNode(Node):
                 self.desired_pose_twist_msg.pose.position.y = radius * (1 - np.cos(angular_velocity * t))
                 self.desired_pose_twist_msg.twist.linear.x =  radius * angular_velocity * np.cos(angular_velocity * t) #m/s
                 self.desired_pose_twist_msg.twist.linear.y = radius * angular_velocity * np.sin(angular_velocity * t) #m/s
+                self.desired_pose_twist_msg.twist.angular.z = angular_velocity
             else:
                 self.desired_pose_twist_msg.pose.position.x = radius * np.sin(angular_velocity * t) #m
                 self.desired_pose_twist_msg.pose.position.y = radius * (np.cos(angular_velocity * t) - 1) #m
                 self.desired_pose_twist_msg.twist.linear.x =  radius * angular_velocity * np.cos(angular_velocity * t) #m/s
                 self.desired_pose_twist_msg.twist.linear.y = - radius * angular_velocity * np.sin(angular_velocity * t) #m/s
+                self.desired_pose_twist_msg.twist.angular.z = -1 * angular_velocity
+                
+            theta = np.arctan2(self.desired_pose_twist_msg.twist.linear.y, self.desired_pose_twist_msg.twist.linear.x)
+            q = quaternion_from_euler(0.0, 0.0, float(theta))
+            self.desired_pose_twist_msg.pose.orientation.x = q[0]
+            self.desired_pose_twist_msg.pose.orientation.y = q[1]
+            self.desired_pose_twist_msg.pose.orientation.z = q[2]
+            self.desired_pose_twist_msg.pose.orientation.w = q[3]
+            
         else:
             self.desired_pose_twist_msg.twist.linear.x = 0.0
             self.desired_pose_twist_msg.twist.linear.y = 0.0
+            self.desired_pose_twist_msg.twist.angular.z = 0.0
             self.publisher_.publish(self.desired_pose_twist_msg) 
             self.get_logger().info("Trajectory generator finished")
             self.destroy_node()
