@@ -6,7 +6,7 @@ from geometry_msgs.msg import PoseStamped
 import numpy as np
 from tf_transformations import quaternion_from_euler
 
-v_max = 0.1
+v_max = 0.05
 duration = 2*np.pi/v_max
 a = 1.0 #horizontal amplitude
 b = 0.5 #vertical amplitude
@@ -125,6 +125,7 @@ class CircularTrajectoryNode(Node):
         else:
             self.desired_pose_twist_msg.twist.linear.x = 0.0
             self.desired_pose_twist_msg.twist.linear.y = 0.0
+            self.desired_pose_twist_msg.twist.angular.z = 0.0
             self.publisher_.publish(self.desired_pose_twist_msg) 
             self.get_logger().info("Trajectory generator finished")
             self.destroy_node()

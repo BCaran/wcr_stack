@@ -86,7 +86,7 @@ class NonLinearController(Node):
         e_y = -(x_d - self.x_)*math.sin(self.th_) + (y_d - self.y_)*math.cos(self.th_)
         th_d = (th_d + 2*np.pi) % (2*np.pi)
         self.th_ = (self.th_ + 2*np.pi) % (2*np.pi)
-        e_th = th_d - self.th_
+        e_th = (th_d - self.th_ + np.pi) % (2*np.pi) - np.pi
         
         self.get_logger().info("Theta_d: %f" % th_d)
         self.get_logger().info("Theta: %f" % self.th_)
