@@ -1,0 +1,35 @@
+# wcr_stack external dependencies
+# Usage (from <ws>/src):  vcs import < wcr_stack/wcr.repos
+# Versions are pinned to commit SHAs (as of 2026-10-16) for reproducibility.
+# To refresh: vcs pull, test, then  vcs export --exact > wcr_stack/wcr.repos
+
+repositories:
+  vesc:
+    type: git
+    url: https://github.com/f1tenth/vesc.git
+    version: 1bc8251296abb3936da5f30821b6311d67e861b7   # humble
+
+  transport_drivers:
+    type: git
+    url: https://github.com/ros-drivers/transport_drivers.git
+    version: d3f510ce1b4be12967064d8251ebcac530921a04   # humble
+
+  realsense_t265_shelfino:
+    type: git
+    url: https://github.com/idra-lab/realsense_t265_shelfino.git
+    version: b8baca6a50ad650e1c0fac8d45bbd753fbbb55a8   # ros2-master
+
+  dynamixel_hardware_interface:
+    type: git
+    url: https://github.com/BCaran/dynamixel_hardware_interface.git
+    version: 8d91886a6c137f09906d38fbb9b18ca99a598bc7   # humble (fork: XH430-W210 torque params)
+
+  DynamixelSDK:
+    type: git
+    url: https://github.com/ROBOTIS-GIT/DynamixelSDK.git
+    version: 59abd67d1f16a199cf0c8608231aee6bb63a57f3   # humble
+
+  dynamixel_interfaces:
+    type: git
+    url: https://github.com/ROBOTIS-GIT/dynamixel_interfaces.git
+    version: 9e2ea841be6396ce820e9c1545d9487c42879158   # humble
