@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="robot">
+
+
+    <xacro:arg name="mode" default="classic"/>
+
+    <xacro:include filename="wcr_common_properties.xacro"/>
+    <xacro:include filename="wcr_base.xacro"/>
+
+    <xacro:include filename="wcr_mix.ros2_control.xacro"/>
+
+
+
+</robot>
