@@ -1,0 +1,45 @@
+controller_manager:
+    ros__parameters:
+      update_rate: 100  # Hz
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      driving_velocity_controller:
+        type: forward_command_controller/ForwardCommandController
+
+      steering_position_controller:
+        type: forward_command_controller/ForwardCommandController
+    
+joint_state_broadcaster:
+  ros__parameters:
+    joints:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+
+driving_velocity_controller:
+  ros__parameters:
+    joints:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+    interface_name: velocity
+
+steering_position_controller:
+  ros__parameters:
+    joints:
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+    interface_name: position
+    command: [0.0, 0.0, 0.0, 0.0]
+    
+

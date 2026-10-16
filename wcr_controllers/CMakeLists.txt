@@ -1,0 +1,73 @@
+cmake_minimum_required(VERSION 3.5)
+project(wcr_controllers)
+
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(control_msgs REQUIRED)
+
+
+
+add_executable(inv_kin_controller src/inv_kin_controller.cpp)
+ament_target_dependencies(inv_kin_controller rclcpp std_msgs geometry_msgs std_srvs)
+
+add_executable(trajectory_generator src/trajectory_generator.cpp)
+ament_target_dependencies(trajectory_generator rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs)
+
+add_executable(model_based_controller src/model_based_controller.cpp)
+ament_target_dependencies(model_based_controller rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs)
+
+add_executable(model_based_controller_velocity src/model_based_controller_velocity.cpp)
+ament_target_dependencies(model_based_controller_velocity rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs control_msgs)
+
+add_executable(reduced_model_based_controller_velocity src/reduced_model_based_controller_velocity.cpp)
+ament_target_dependencies(reduced_model_based_controller_velocity rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs control_msgs)
+
+add_executable(torque_controller src/torque_model_based_controller.cpp)
+ament_target_dependencies(torque_controller rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs)
+
+add_executable(mimic_help_controller src/mimic_help_controller.cpp)
+ament_target_dependencies(mimic_help_controller rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs)
+
+add_executable(model_based_controller_velocity_orig src/model_based_controller_velocity_orig.cpp)
+ament_target_dependencies(model_based_controller_velocity_orig rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs control_msgs)
+
+add_executable(model_based_controller_velocity_smc src/model_based_controller_velocity_smc.cpp)
+ament_target_dependencies(model_based_controller_velocity_smc rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs control_msgs)
+
+add_executable(model_based_controller_velocity_wall_eight src/model_based_controller_velocity_wall_eight.cpp)
+ament_target_dependencies(model_based_controller_velocity_wall_eight rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs control_msgs)
+
+add_executable(model_based_controller_velocity_smc_wall_eight src/model_based_controller_velocity_smc_wall_eight.cpp)
+ament_target_dependencies(model_based_controller_velocity_smc_wall_eight  rclcpp std_msgs geometry_msgs std_srvs tf2 tf2_geometry_msgs nav_msgs sensor_msgs control_msgs)
+
+install(TARGETS
+  inv_kin_controller
+  trajectory_generator
+  model_based_controller
+  model_based_controller_velocity
+  reduced_model_based_controller_velocity
+  torque_controller
+  mimic_help_controller
+  model_based_controller_velocity_orig
+  model_based_controller_velocity_smc
+  model_based_controller_velocity_wall_eight
+  model_based_controller_velocity_smc_wall_eight
+  DESTINATION lib/${PROJECT_NAME})
+
+ament_package()

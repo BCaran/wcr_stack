@@ -1,0 +1,95 @@
+controller_manager:
+    ros__parameters:
+      update_rate: 300
+      lock_memory: true
+      cpu_affinity: 3
+      thread_priority: 90
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      steering_velocity_controller:
+        type: forward_command_controller/ForwardCommandController
+
+      smc_velocity_controller:
+        type: wheel_smc_controller/WheelSmcController
+
+joint_state_broadcaster:
+  ros__parameters:
+    joints:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+
+steering_velocity_controller:
+  ros__parameters:
+    joints:
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+    interface_name: velocity
+
+smc_velocity_controller:
+  ros__parameters:
+    # Wheel order matters: drive_joints[i], steer_joints[i], wheel_x[i], wheel_y[i]
+    # all refer to the SAME physical wheel.
+    drive_joints:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+
+    steer_joints:
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+
+    # Wheel positions in robot frame (a = b = 0.1125 m, square footprint).
+    # Order matches drive_joints above:
+    #   FL = (+a, +b)
+    #   BL = (-a, +b)
+    #   BR = (-a, -b)
+    #   FR = (+a, -b)
+    wheel_x: [ 0.1125, -0.1125, -0.1125,  0.1125]
+    wheel_y: [ 0.1125,  0.1125, -0.1125, -0.1125]
+
+    # Robot dynamics (Caran et al. 2026 Table I)
+    mass_total:      3.50      # m
+    inertia_total:   0.0365    # I = Iθ + 4*mw*(a²+b²)
+    wheel_inertia:   1.03e-5   # Iφ
+    wheel_radius:    0.0254    # r
+
+    # SMC gains — sized to actually overcome stiction.
+    #
+    # Math: τ ≈ B_r⁻¹ · k_switch · sat(S/ε)  when |S| < ε.
+    # The slope at S=0 is k_switch/ε — keep this moderate to avoid chattering.
+    # With k_switch=500, ε=0.5 → slope=1000, which is about as aggressive
+    # as you want before chatter dominates.
+    lambda:   [2.0, 2.0, 2.0, 2.0]
+    k_switch: [50.0, 50.0, 50.0, 50.0]
+
+    boundary_layer: 1.0       # widened 5× to kill chatter (was 0.1 → ringing)
+    torque_limit:   1.0
+    regularization: 1.0e-6
+
+    # Velocity reference is published by your kinematic node as a
+    # std_msgs/Float64MultiArray on this topic. Accepted lengths:
+    #   4 -> [v1c..v4c]
+    #   8 -> [v1c..v4c, v1c_dot..v4c_dot]            (recommended)
+    #   9 -> [v1c..v4c, v1c_dot..v4c_dot, theta_dot] (theta_dot ignored for now)
+    velocity_reference_topic: "~/velocity_reference"
+    odom_topic:               "/wcr/odom"
+    use_odom_for_omega:       false
+
+    # Set true if you see low-frequency oscillation in wheel velocity that
+    # PID baseline doesn't have. The Coriolis-like A_r·v term uses the
+    # dynamic model and can inject noise if dynamic parameters are off.
+    # Disabling reduces to robust PI + model-based torque mapping.
+    disable_coriolis: false

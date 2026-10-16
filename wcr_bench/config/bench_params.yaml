@@ -1,0 +1,125 @@
+# WCR bench - force sensor node configuration
+#
+# Load with:
+#   ros2 run wcr_bench bench_forces --ros-args \
+#       --params-file src/wcr_bench/config/bench_params.yaml
+#
+# or through the launch file:
+#   ros2 launch wcr_bench bench.launch.py
+
+bench_forces:
+  ros__parameters:
+
+    # ---- serial port ------------------------------------------------
+    #
+    # On a machine where the Arduino is the only serial device,
+    # /dev/ttyACM0 is fine. On the robot's Jetson it is NOT: the ODrive
+    # and the VESC also enumerate as serial devices and the numbering
+    # depends on boot order. Create a stable symlink instead:
+    #
+    #   SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", \
+    #   ATTRS{idProduct}=="0058", ATTRS{serial}=="<board serial>", \
+    #   SYMLINK+="bench_nano", MODE="0666"
+    #
+    # in /etc/udev/rules.d/99-bench-nano.rules, then set port to
+    # /dev/bench_nano below. Read the board serial from dmesg after
+    # plugging it in.
+    #
+    port: /dev/bench_nano
+    baudrate: 115200
+
+    # ---- calibration ------------------------------------------------
+    #
+    # Counts per gram, one per cell. A factor belongs to the PHYSICAL
+    # cell, i.e. to its pin pair on the Arduino - not to the name. If
+    # the harness is reordered, the factors move with the wiring.
+    #
+    # Current mapping (Arduino pins CLK / DAT):
+    #   FL = D7  / D8
+    #   BL = D9  / D10
+    #   BR = D11 / D12
+    #   FR = A0  / A1
+    #
+    # Measured 29 Jul 2026, four-point procedure, then corrected 4 Aug.
+    #
+    # The original fit used the masses' nominal values, 812 g and 966 g.
+    # They were later weighed and found to be 805 g and 959 g, so every
+    # factor came out 0.79% low and every reading 0.79% high. Redoing the
+    # regression with the true masses scales all four slopes by 1.007877,
+    # which is what the values below already include.
+    #
+    # Independent confirmation: the robot weighs 3935 g on a scale and the
+    # bench read 3966 g with the old factors - a ratio of 1.00788, matching
+    # the 1.007877 derived from the masses alone.
+    #
+    # Worst linearity residual across all four cells: 0.45 g on 1778 g.
+    # The mass error does not affect linearity, only scale.
+    #
+    # Recalibrate if a cell is remounted, if the harness changes, or if
+    # the supply voltage to the HX711 boards changes - bridge excitation
+    # scales the factor directly.
+    #
+    calibration:
+      fl: 471.39    # was 467.71
+      bl: 431.06    # was 427.69
+      br: 474.74    # was 471.03
+      fr: 444.76    # was 441.28
+
+    # ---- tare -------------------------------------------------------
+    #
+    # Number of samples averaged when the /bench/tare service is called.
+    # At ~11 Hz, 30 samples is roughly 3 seconds.
+    #
+    # Note for measurement campaigns: prefer NOT to tare before
+    # recording. Record absolute values and subtract the baseline
+    # offline - that preserves the robot's static weight per wheel and
+    # keeps thermal drift visible and correctable.
+    #
+    tare_samples: 240
+
+    # Apply a tare automatically at startup. Leave false: an automatic
+    # tare would silently zero whatever happens to be on the bench.
+    tare_on_start: false
+
+    # ---- console ----------------------------------------------------
+    #
+    # Labelled console view, in whole grams, for checking that each cup
+    # drives the expected channel. Published data keeps full precision.
+    #
+    console: true
+    console_period_ms: 500
+
+    # ---- sample rate ------------------------------------------------
+    #
+    # The HX711 has two rates, selected by its RATE pin: 10 SPS (pin low)
+    # and 80 SPS (pin high). The SparkFun breakouts ship strapped to
+    # 10 SPS, which measures as ~11 Hz here - the chip's internal RC
+    # oscillator runs slightly fast, so the real rate sits a little above
+    # nominal. At 80 SPS expect roughly 86-88 Hz.
+    #
+    # Switching to 80 SPS is a HARDWARE change on each of the four
+    # breakouts, and it costs resolution: the chip averages over fewer
+    # cycles, so per-sample noise grows substantially. Only worth it if
+    # you need the EDF spin-up transient rather than steady plateaus.
+    #
+    # After switching, widen the window below or the node warns on every
+    # sample:
+    #     10 SPS  ->  dt_min 40,  dt_max 400
+    #     80 SPS  ->  dt_min  6,  dt_max  60
+    #
+    dt_min_ms: 40.0
+    dt_max_ms: 400.0
+
+    # Serial poll period. Keep it well under the sample period.
+    poll_period_ms: 10
+
+    # ---- gravity ----------------------------------------------------
+    #
+    # Used to convert grams to newtons on /bench/forces_n.
+    # 9.80665 is the standard value. Substitute the local value for the
+    # lab if you need force figures better than a part in a thousand.
+    #
+    gravity: 9.80665
+
+    # ---- frame ------------------------------------------------------
+    frame_id: bench

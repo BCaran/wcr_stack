@@ -1,0 +1,54 @@
+controller_manager:
+    ros__parameters:
+      update_rate: 300
+      lock_memory: true
+      cpu_affinity: 3
+      thread_priority: 90
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      steering_velocity_controller:
+        type: forward_command_controller/ForwardCommandController
+
+      pid_velocity_controller:
+        type: pid_controller/PidController
+    
+joint_state_broadcaster:
+  ros__parameters:
+    joints:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+
+steering_velocity_controller:
+  ros__parameters:
+    joints:
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+    interface_name: velocity
+
+pid_velocity_controller:
+  ros__parameters:
+    dof_names:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+
+    command_interface: effort
+    reference_and_state_interfaces: ["velocity"]
+
+    gains:
+      FL_wheel: {p: 0.03, i: 0.1, d: 0.001, i_clamp_min: -1.0, i_clamp_max: 1.0, antiwindup: true}
+      BL_wheel: {p: 0.03, i: 0.1, d: 0.001, i_clamp_min: -1.0, i_clamp_max: 1.0, antiwindup: true}
+      BR_wheel: {p: 0.03, i: 0.1, d: 0.001, i_clamp_min: -1.0, i_clamp_max: 1.0, antiwindup: true}
+      FR_wheel: {p: 0.03, i: 0.1, d: 0.001, i_clamp_min: -1.0, i_clamp_max: 1.0, antiwindup: true}
+
