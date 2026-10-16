@@ -53,7 +53,7 @@ ros2 launch wcr_bringup wcr_classic.launch.py
 ros2 launch wcr_system full_system.launch.py
 ```
 
-Other controller configurations are available in `wcr_bringup/launch/` (`wcr_velocity`, `wcr_effort`, `wcr_smc`, `wcr_chained`, `wcr_mix`, `wcr_mimic`), with matching parameter files in `wcr_bringup/config/`. `mock_wcr_classic_full.launch.py` runs the stack without hardware.
+Other controller configurations are available in `wcr_bringup/launch/` (`wcr_swerve`, `wcr_velocity`, `wcr_effort`, `wcr_smc`, `wcr_chained`, `wcr_mix`, `wcr_mimic`), with matching parameter files in `wcr_bringup/config/`. `mock_wcr_classic_full.launch.py` runs the stack without hardware.
 
 ## Repository layout
 
@@ -61,6 +61,7 @@ Other controller configurations are available in `wcr_bringup/launch/` (`wcr_vel
 |---|---|
 | `wcr_bringup` | Launch files and ros2_control controller configurations |
 | `wcr_controllers` | 4WIS4WID controllers: inverse kinematics, model-based and sliding-mode velocity/torque control, trajectory generator |
+| `swerve_drive_controller` | ros2_control controller for the 4WIS4WID base: twist in, wheel velocities and steering position/velocity out, wheel odometry |
 | `wheel_smc_controller` | Sliding-mode wheel controller as a ros2_control plugin |
 | `wcr_odometry` | Wheel odometry for the 4WIS4WID platform |
 | `wcr_interfaces` | Custom messages (`OdomAccel`, `ThrusterData`, `DesiredPoseTwist`, `LoadCellData`) |

@@ -1,0 +1,12 @@
+<library path="swerve_drive_controller">
+  <class name="swerve_drive_controller/SwerveDriveController"
+         type="swerve_drive_controller::SwerveDriveController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Controller for a four-wheel independent steering, four-wheel independent
+      drive (4WIS4WID / swerve) base. Transforms a body twist into driving wheel
+      velocities and steering position or velocity commands, and publishes
+      wheel odometry.
+    </description>
+  </class>
+</library>

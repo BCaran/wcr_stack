@@ -1,0 +1,25 @@
+test_swerve_drive_controller:
+  ros__parameters:
+    drive_joint_fl: FL_wheel
+    drive_joint_bl: BL_wheel
+    drive_joint_br: BR_wheel
+    drive_joint_fr: FR_wheel
+    steering_joint_fl: FL_steering
+    steering_joint_bl: BL_steering
+    steering_joint_br: BR_steering
+    steering_joint_fr: FR_steering
+
+    x_w_fl: 0.1125
+    y_w_fl: 0.1125
+    r_w_fl: 0.0254
+    x_w_bl: -0.1125
+    y_w_bl: 0.1125
+    r_w_bl: 0.0254
+    x_w_br: -0.1125
+    y_w_br: -0.1125
+    r_w_br: 0.0254
+    x_w_fr: 0.1125
+    y_w_fr: -0.1125
+    r_w_fr: 0.0254
+
+    steering_command_interface: position

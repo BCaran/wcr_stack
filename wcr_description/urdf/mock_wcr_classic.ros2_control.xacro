@@ -4,6 +4,7 @@
         <hardware>
             <!-- Use ros2_control demo mock system -->
             <plugin>mock_components/GenericSystem</plugin>
+            <param name="calculate_dynamics">true</param>
             <param name="example_param_hw_start_duration_sec">0.0</param>
             <param name="example_param_hw_stop_duration_sec">0.0</param>
         </hardware>

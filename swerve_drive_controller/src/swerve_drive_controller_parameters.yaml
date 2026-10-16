@@ -1,0 +1,320 @@
+# Parameter definitions for swerve_drive_controller (generate_parameter_library).
+#
+# Wheel order and naming follow the WCR convention:
+#   fl = front-left, bl = back-left, br = back-right, fr = front-right
+# Wheel positions are expressed in base_frame_id (x forward, y left).
+#
+# Parameters marked read_only are applied on configure. All other parameters
+# can be changed at runtime with `ros2 param set` and are picked up by the
+# realtime loop on the next update.
+
+swerve_drive_controller:
+  # ---------------------------------------------------------------- joints
+  drive_joint_fl: {
+    type: string,
+    default_value: "",
+    description: "Front-left driving (wheel) joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+  drive_joint_bl: {
+    type: string,
+    default_value: "",
+    description: "Back-left driving (wheel) joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+  drive_joint_br: {
+    type: string,
+    default_value: "",
+    description: "Back-right driving (wheel) joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+  drive_joint_fr: {
+    type: string,
+    default_value: "",
+    description: "Front-right driving (wheel) joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+  steering_joint_fl: {
+    type: string,
+    default_value: "",
+    description: "Front-left steering joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+  steering_joint_bl: {
+    type: string,
+    default_value: "",
+    description: "Back-left steering joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+  steering_joint_br: {
+    type: string,
+    default_value: "",
+    description: "Back-right steering joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+  steering_joint_fr: {
+    type: string,
+    default_value: "",
+    description: "Front-right steering joint.",
+    read_only: true,
+    validation: { not_empty<>: [] }
+  }
+
+  # ------------------------------------------------- geometry / calibration
+  x_w_fl: {
+    type: double,
+    default_value: 0.1125,
+    description: "x position of the front-left steering axis in base_frame_id [m].",
+  }
+  y_w_fl: {
+    type: double,
+    default_value: 0.1125,
+    description: "y position of the front-left steering axis in base_frame_id [m].",
+  }
+  r_w_fl: {
+    type: double,
+    default_value: 0.0254,
+    description: "Front-left wheel radius [m].",
+    validation: { gt<>: [0.0] }
+  }
+  x_w_bl: {
+    type: double,
+    default_value: -0.1125,
+    description: "x position of the back-left steering axis in base_frame_id [m].",
+  }
+  y_w_bl: {
+    type: double,
+    default_value: 0.1125,
+    description: "y position of the back-left steering axis in base_frame_id [m].",
+  }
+  r_w_bl: {
+    type: double,
+    default_value: 0.0254,
+    description: "Back-left wheel radius [m].",
+    validation: { gt<>: [0.0] }
+  }
+  x_w_br: {
+    type: double,
+    default_value: -0.1125,
+    description: "x position of the back-right steering axis in base_frame_id [m].",
+  }
+  y_w_br: {
+    type: double,
+    default_value: -0.1125,
+    description: "y position of the back-right steering axis in base_frame_id [m].",
+  }
+  r_w_br: {
+    type: double,
+    default_value: 0.0254,
+    description: "Back-right wheel radius [m].",
+    validation: { gt<>: [0.0] }
+  }
+  x_w_fr: {
+    type: double,
+    default_value: 0.1125,
+    description: "x position of the front-right steering axis in base_frame_id [m].",
+  }
+  y_w_fr: {
+    type: double,
+    default_value: -0.1125,
+    description: "y position of the front-right steering axis in base_frame_id [m].",
+  }
+  r_w_fr: {
+    type: double,
+    default_value: 0.0254,
+    description: "Front-right wheel radius [m].",
+    validation: { gt<>: [0.0] }
+  }
+
+  # -------------------------------------------------------------- steering
+  steering_command_interface: {
+    type: string,
+    default_value: "position",
+    description: "Command interface of the steering joints. 'position' forwards the steering angle to the hardware. 'velocity' closes a P loop on the measured steering angle: cmd = feedforward + k_delta * (delta_ref - delta).",
+    read_only: true,
+    validation: { one_of<>: [["position", "velocity"]] }
+  }
+  k_delta: {
+    type: double,
+    default_value: 5.0,
+    description: "Proportional gain of the steering angle loop [1/s]. Only used when steering_command_interface is 'velocity'.",
+    validation: { gt_eq<>: [0.0] }
+  }
+  steering_velocity_feedforward: {
+    type: bool,
+    default_value: true,
+    description: "Add the low-pass filtered derivative of the steering reference as feedforward in the steering velocity loop. Only used when steering_command_interface is 'velocity'.",
+  }
+  steering_feedforward_cutoff_frequency: {
+    type: double,
+    default_value: 5.0,
+    description: "Cut-off frequency of the first-order low-pass filter on the steering feedforward [Hz].",
+    validation: { gt<>: [0.0] }
+  }
+  max_steering_velocity: {
+    type: double,
+    default_value: 0.0,
+    description: "Saturation of the steering velocity command [rad/s]. 0.0 disables the limit. Only used when steering_command_interface is 'velocity'.",
+    validation: { gt_eq<>: [0.0] }
+  }
+  has_steering_limits: {
+    type: bool,
+    default_value: false,
+    description: "Limit the steering angle to [min_steering_angle, max_steering_angle]. A wheel is flipped (angle -+ pi, reversed speed) only when its steering angle would exceed a limit. Without limits the steering is treated as continuous and never flipped.",
+  }
+  min_steering_angle: {
+    type: double,
+    default_value: .NAN,
+    description: "Lower steering angle limit [rad]. Optional, defaults to -max_steering_angle.",
+  }
+  max_steering_angle: {
+    type: double,
+    default_value: .NAN,
+    description: "Upper steering angle limit [rad]. Required when has_steering_limits is true. Use a range of at least pi so every heading is reachable.",
+  }
+  scale_drive_by_steering_error: {
+    type: bool,
+    default_value: false,
+    description: "Scale each wheel velocity by max(0, cos(delta_ref - delta)) so wheels do not push while they are still turning to the reference angle.",
+  }
+
+  # --------------------------------------------------------------- driving
+  max_wheel_angular_velocity: {
+    type: double,
+    default_value: 0.0,
+    description: "Maximum driving wheel angular velocity [rad/s]. When a wheel would exceed it, all wheel velocities are scaled down by the same factor so the direction of motion is kept. 0.0 disables the limit.",
+    validation: { gt_eq<>: [0.0] }
+  }
+
+  # -------------------------------------------------------------- odometry
+  tf_frame_prefix_enable: {
+    type: bool,
+    default_value: true,
+    description: "Enables or disables appending tf_prefix to tf frame ids.",
+    read_only: true,
+  }
+  tf_frame_prefix: {
+    type: string,
+    default_value: "",
+    description: "(optional) Prefix added to odom_frame_id and base_frame_id. If empty, the controller's namespace is used.",
+    read_only: true,
+  }
+  odom_frame_id: {
+    type: string,
+    default_value: "odom",
+    description: "Name of the odometry frame, parent of base_frame_id.",
+    read_only: true,
+  }
+  base_frame_id: {
+    type: string,
+    default_value: "base_link",
+    description: "Name of the robot's base frame, child of odom_frame_id.",
+    read_only: true,
+  }
+  pose_covariance_diagonal: {
+    type: double_array,
+    default_value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    description: "Diagonal of the odometry pose covariance (x, y, z, roll, pitch, yaw). A reasonable starting point: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01].",
+    read_only: true,
+    validation: { fixed_size<>: [6] }
+  }
+  twist_covariance_diagonal: {
+    type: double_array,
+    default_value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    description: "Diagonal of the odometry twist covariance (vx, vy, vz, wx, wy, wz). A reasonable starting point: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01].",
+    read_only: true,
+    validation: { fixed_size<>: [6] }
+  }
+  open_loop: {
+    type: bool,
+    default_value: false,
+    description: "If true, odometry is integrated from the commanded (limited) twist instead of joint feedback.",
+    read_only: true,
+  }
+  position_feedback: {
+    type: bool,
+    default_value: false,
+    description: "If true, odometry uses the driving joints' position interface (wheel displacement). If false, it uses the velocity interface.",
+    read_only: true,
+  }
+  enable_odom_tf: {
+    type: bool,
+    default_value: true,
+    description: "Publish the transform from odom_frame_id to base_frame_id on /tf.",
+    read_only: true,
+  }
+  velocity_rolling_window_size: {
+    type: int,
+    default_value: 10,
+    description: "Size of the rolling window used to average the odometry velocity estimate.",
+    read_only: true,
+    validation: { gt<>: [0] }
+  }
+  publish_rate: {
+    type: double,
+    default_value: 50.0,
+    description: "Publishing rate of the odometry and tf messages [Hz].",
+    read_only: true,
+    validation: { gt<>: [0.0] }
+  }
+
+  # --------------------------------------------------------------- command
+  cmd_vel_timeout: {
+    type: double,
+    default_value: 0.5,
+    description: "Time after which a velocity command is considered stale and the robot stops [s]. 0.0 disables the timeout.",
+    validation: { gt_eq<>: [0.0] }
+  }
+  use_stamped_vel: {
+    type: bool,
+    default_value: true,
+    description: "If true, subscribe to geometry_msgs/TwistStamped on ~/cmd_vel and use its stamp for the timeout. If false, subscribe to geometry_msgs/Twist on ~/cmd_vel_unstamped.",
+    read_only: true,
+  }
+  publish_limited_velocity: {
+    type: bool,
+    default_value: false,
+    description: "Publish the twist after velocity, acceleration and jerk limits on ~/cmd_vel_out.",
+    read_only: true,
+  }
+
+  # ----------------------------------------------------- body twist limits
+  linear:
+    x:
+      has_velocity_limits: { type: bool, default_value: false }
+      has_acceleration_limits: { type: bool, default_value: false }
+      has_jerk_limits: { type: bool, default_value: false }
+      max_velocity: { type: double, default_value: .NAN }
+      min_velocity: { type: double, default_value: .NAN }
+      max_acceleration: { type: double, default_value: .NAN }
+      min_acceleration: { type: double, default_value: .NAN }
+      max_jerk: { type: double, default_value: .NAN }
+      min_jerk: { type: double, default_value: .NAN }
+    y:
+      has_velocity_limits: { type: bool, default_value: false }
+      has_acceleration_limits: { type: bool, default_value: false }
+      has_jerk_limits: { type: bool, default_value: false }
+      max_velocity: { type: double, default_value: .NAN }
+      min_velocity: { type: double, default_value: .NAN }
+      max_acceleration: { type: double, default_value: .NAN }
+      min_acceleration: { type: double, default_value: .NAN }
+      max_jerk: { type: double, default_value: .NAN }
+      min_jerk: { type: double, default_value: .NAN }
+  angular:
+    z:
+      has_velocity_limits: { type: bool, default_value: false }
+      has_acceleration_limits: { type: bool, default_value: false }
+      has_jerk_limits: { type: bool, default_value: false }
+      max_velocity: { type: double, default_value: .NAN }
+      min_velocity: { type: double, default_value: .NAN }
+      max_acceleration: { type: double, default_value: .NAN }
+      min_acceleration: { type: double, default_value: .NAN }
+      max_jerk: { type: double, default_value: .NAN }
+      min_jerk: { type: double, default_value: .NAN }

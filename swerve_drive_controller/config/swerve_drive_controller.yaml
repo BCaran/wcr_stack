@@ -1,0 +1,105 @@
+# Reference configuration for swerve_drive_controller on the WCR.
+# Every parameter is listed with WCR values. Defaults and full descriptions:
+#   src/swerve_drive_controller_parameters.yaml
+#
+# Load it next to the controller_manager configuration:
+#
+# controller_manager:
+#   ros__parameters:
+#     update_rate: 100
+#     swerve_drive_controller:
+#       type: swerve_drive_controller/SwerveDriveController
+#
+# Parameters without "(read-only)" can be tuned live, e.g.
+#   ros2 param set /swerve_drive_controller k_delta 8.0
+#   ros2 param set /swerve_drive_controller r_w_fl 0.0251
+
+swerve_drive_controller:
+  ros__parameters:
+    # Joints (read-only). Wheel order is fl, bl, br, fr everywhere.
+    drive_joint_fl: FL_wheel
+    drive_joint_bl: BL_wheel
+    drive_joint_br: BR_wheel
+    drive_joint_fr: FR_wheel
+    steering_joint_fl: FL_steering
+    steering_joint_bl: BL_steering
+    steering_joint_br: BR_steering
+    steering_joint_fr: FR_steering
+
+    # Geometry / calibration: steering axis position in base_link [m], wheel radius [m].
+    x_w_fl: 0.1125
+    y_w_fl: 0.1125
+    r_w_fl: 0.0254
+    x_w_bl: -0.1125
+    y_w_bl: 0.1125
+    r_w_bl: 0.0254
+    x_w_br: -0.1125
+    y_w_br: -0.1125
+    r_w_br: 0.0254
+    x_w_fr: 0.1125
+    y_w_fr: -0.1125
+    r_w_fr: 0.0254
+
+    # Steering.
+    #   position: steering angle is forwarded to the hardware position interface.
+    #   velocity: cmd = feedforward + k_delta * (delta_ref - delta), saturated
+    #             to max_steering_velocity.
+    steering_command_interface: position     # (read-only) position | velocity
+    k_delta: 5.0                             # [1/s], velocity mode only
+    steering_velocity_feedforward: true      # velocity mode only: adds d(delta_ref)/dt
+    steering_feedforward_cutoff_frequency: 5.0  # [Hz] low-pass on that derivative (Fc_dot)
+    max_steering_velocity: 5.035             # [rad/s], 0 = no limit (XH430: 210 * 0.229 rpm)
+    scale_drive_by_steering_error: false     # drive *= max(0, cos(delta_ref - delta))
+
+    # Steering angle limits (optional, like the body twist limits below).
+    # A wheel is flipped (angle -+ pi, reversed speed) only when its angle
+    # would exceed a limit. With has_steering_limits: false the steering is
+    # continuous and never flipped.
+    has_steering_limits: true
+    max_steering_angle: 1.5707963267948966   # [rad], required with limits (URDF: pi/2)
+    min_steering_angle: -1.5707963267948966  # [rad], optional, defaults to -max
+
+    # Driving (always velocity). All wheels are scaled by the same factor when
+    # one exceeds the limit, so the direction of motion is kept.
+    max_wheel_angular_velocity: 5.035        # [rad/s], 0 = no limit
+
+    # Odometry.
+    open_loop: false                         # (read-only) integrate commands instead of feedback
+    position_feedback: false                 # (read-only) wheel position instead of velocity
+    velocity_rolling_window_size: 10         # (read-only)
+    odom_frame_id: odom                      # (read-only)
+    base_frame_id: base_link                 # (read-only)
+    tf_frame_prefix_enable: true             # (read-only)
+    tf_frame_prefix: ""                      # (read-only)
+    enable_odom_tf: true                     # (read-only)
+    publish_rate: 50.0                       # (read-only) [Hz]
+    pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]   # (read-only)
+    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]  # (read-only)
+
+    # Command input.
+    use_stamped_vel: false                   # (read-only) false: Twist on ~/cmd_vel_unstamped
+    cmd_vel_timeout: 0.5                     # [s], 0 = no timeout
+    publish_limited_velocity: false          # (read-only) ~/cmd_vel_out
+
+    # Body twist limits (same layout as diff_drive_controller, plus linear.y).
+    # A limit is only applied when its has_*_limits flag is true; min defaults to -max.
+    linear.x.has_velocity_limits: true
+    linear.x.max_velocity: 0.12              # [m/s]
+    linear.x.has_acceleration_limits: false
+    linear.x.max_acceleration: .NAN          # [m/s^2]
+    linear.x.has_jerk_limits: false
+    linear.x.max_jerk: .NAN                  # [m/s^3]
+
+    linear.y.has_velocity_limits: true
+    linear.y.max_velocity: 0.12
+    linear.y.has_acceleration_limits: false
+    linear.y.max_acceleration: .NAN
+    linear.y.has_jerk_limits: false
+    linear.y.max_jerk: .NAN
+
+    angular.z.has_velocity_limits: true
+    angular.z.max_velocity: 1.0              # [rad/s]
+    angular.z.has_acceleration_limits: false
+    angular.z.max_acceleration: .NAN         # [rad/s^2]
+    angular.z.has_jerk_limits: false
+    angular.z.max_jerk: .NAN                 # [rad/s^3]

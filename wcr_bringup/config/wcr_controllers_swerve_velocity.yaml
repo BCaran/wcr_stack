@@ -1,0 +1,75 @@
+# swerve_drive_controller with velocity-controlled steering (P loop on the
+# steering angle, hardware: wcr_velocity).
+# All parameters: swerve_drive_controller/config/swerve_drive_controller.yaml
+
+controller_manager:
+    ros__parameters:
+      update_rate: 100  # Hz
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      swerve_drive_controller:
+        type: swerve_drive_controller/SwerveDriveController
+
+joint_state_broadcaster:
+  ros__parameters:
+    joints:
+      - FL_wheel
+      - BL_wheel
+      - BR_wheel
+      - FR_wheel
+      - FL_steering
+      - BL_steering
+      - BR_steering
+      - FR_steering
+
+swerve_drive_controller:
+  ros__parameters:
+    drive_joint_fl: FL_wheel
+    drive_joint_bl: BL_wheel
+    drive_joint_br: BR_wheel
+    drive_joint_fr: FR_wheel
+    steering_joint_fl: FL_steering
+    steering_joint_bl: BL_steering
+    steering_joint_br: BR_steering
+    steering_joint_fr: FR_steering
+
+    x_w_fl: 0.1125
+    y_w_fl: 0.1125
+    r_w_fl: 0.0254
+    x_w_bl: -0.1125
+    y_w_bl: 0.1125
+    r_w_bl: 0.0254
+    x_w_br: -0.1125
+    y_w_br: -0.1125
+    r_w_br: 0.0254
+    x_w_fr: 0.1125
+    y_w_fr: -0.1125
+    r_w_fr: 0.0254
+
+    steering_command_interface: velocity
+    k_delta: 5.0
+    steering_velocity_feedforward: true
+    steering_feedforward_cutoff_frequency: 5.0
+    max_steering_velocity: 5.035  # 210 * 0.229 rpm
+    # +-pi/2 matches the URDF limits. If the steering can turn further in
+    # velocity mode, widen this or set has_steering_limits: false for
+    # continuous steering.
+    has_steering_limits: true
+    max_steering_angle: 1.5707963267948966   # min defaults to -max
+    scale_drive_by_steering_error: false
+
+    max_wheel_angular_velocity: 5.035
+
+    position_feedback: false
+    odom_frame_id: odom
+    base_frame_id: base_link
+    tf_frame_prefix_enable: false
+    enable_odom_tf: true
+    publish_rate: 50.0
+    pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+
+    use_stamped_vel: false
+    cmd_vel_timeout: 0.5

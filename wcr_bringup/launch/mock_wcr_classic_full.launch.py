@@ -86,6 +86,6 @@ def generate_launch_description():
         driving_controller_spawner,
         steering_position_controller,
         odometry_node,
-        #inv_kin_controller,
+        inv_kin_controller,
         rviz_node
     ])
