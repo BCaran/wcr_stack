@@ -57,10 +57,10 @@ ros2 param set /swerve_drive_controller r_w_fl 0.0251
 ```bash
 ros2 launch wcr_bringup wcr_swerve.launch.py                          # position steering
 ros2 launch wcr_bringup wcr_swerve.launch.py steering_mode:=velocity  # velocity steering
-ros2 launch wcr_bringup wcr_swerve.launch.py use_mock_hardware:=true  # no hardware
+ros2 launch wcr_bringup mock_wcr_swerve.launch.py                     # no hardware, with RViz
 ```
 
-The launch file remaps the controller to `/wcr/cmd_vel` (Twist), `/wcr/odom` and `/reset_odometry`. It replaces `inv_kin_controller` + `wcr_odometry` without changes to teleop or the higher-level controllers.
+Both launch files remap the controller to `/wcr/cmd_vel` (Twist), `/wcr/odom` and `/reset_odometry`. They replace `inv_kin_controller` + `wcr_odometry` without changes to teleop or the higher-level controllers.
 
 ## Tests
 
