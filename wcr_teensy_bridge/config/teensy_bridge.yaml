@@ -1,0 +1,65 @@
+teensy_bridge:
+  ros__parameters:
+    serial_port: /dev/ttyACM0
+    baud_rate: 115200
+
+    # HX711 counts per gram. Replace these with your measured values.
+    # Negative values are valid and simply indicate sensor polarity.
+    front_calibration_factor: 1.0
+    rear_calibration_factor: 1.0
+
+    # Thruster commands are fractions of full throttle: 0.0 = stop, 1.0 = full.
+    # These are floating-point parameters: write 0.0, not 0.
+    thruster_min_command: 0.0
+    thruster_max_command: 1.0
+
+    # Used only before the first valid ROS thruster command arrives.
+    # It is NOT applied after a communication timeout.
+    startup_thruster_command: 0.0
+
+    # After this period without valid serial command frames, Teensy reports an
+    # error and flashes LED 13 quickly, but keeps the last applied command.
+    teensy_command_timeout_ms: 500
+
+    # Lower commands are approached non-blockingly: one step every interval.
+    # 0.001 every 9 ms is the same slope as the old firmware (1 unit of 180
+    # every 50 ms): full scale in 9 s. The step is 0.0 (no ramp) or >= 0.001.
+    ramp_down_step_command: 0.001
+    ramp_down_interval_ms: 9
+
+    # After this period without a new ROS topic sample, the bridge keeps
+    # resending the last command and marks the source as stale.
+    ros_command_timeout_ms: 500
+    command_rate_hz: 20.0
+
+    # Tare takes roughly 2 seconds at the HX711 default 10 samples/s.
+    tare_service_timeout_ms: 10000
+
+    # Thruster data (/wcr/thrusters/data). The Teensy sends ESC telemetry as
+    # fast as the ESCs answer; this is the rate at which the newest values of
+    # all four motors are published. Cannot be changed while the node runs.
+    thruster_data_rate_hz: 50.0
+
+    # A motor is marked not valid when its ESC has not answered for this long.
+    thruster_data_timeout_ms: 500
+
+    # Conversion of the raw Teensy values. These can be changed while the node
+    # runs (ros2 param set).
+    #   rpm     = erpm_raw * 100 / motor_pole_pairs
+    #   voltage = voltage_raw * esc_voltage_scale
+    #   current = current_adc * current_amps_per_adc_count + current_offset_amps
+    #             (a negative result is published as 0)
+
+    # T-Motor F90 2806.5 is 12N14P: 14 magnets = 7 pole pairs.
+    motor_pole_pairs: 7
+
+    # Volts per raw count. The ESC reports in units of 0.01 V. 0.010146 includes
+    # the +1.46 % found against the power analyzer on 2026-10-09; use 0.01 for
+    # the uncorrected ESC reading.
+    esc_voltage_scale: 0.010146
+
+    # Total motor current from the ESC current output (Teensy pin 22, 12-bit ADC).
+    # Measured 2026-10-09 against the power analyzer, 0.28 .. 47.56 A, max error
+    # 0.35 A. Above 47.56 A it is an extrapolation.
+    current_amps_per_adc_count: 0.04438
+    current_offset_amps: -0.666

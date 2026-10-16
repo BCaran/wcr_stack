@@ -1,0 +1,12 @@
+<library path="wheel_smc_controller">
+  <class name="wheel_smc_controller/WheelSmcController"
+         type="wheel_smc_controller::WheelSmcController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      MIMO sliding-mode controller for the four driving wheels of a 4WIS4WID
+      mobile robot (Lee &amp; Li 2014). Subscribes to wheel velocity references
+      (with derivatives and body angular velocity), reads wheel velocities and
+      steering angles as state, and writes torque commands.
+    </description>
+  </class>
+</library>

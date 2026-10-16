@@ -1,0 +1,59 @@
+# Example config for wheel_smc_controller.
+# Load via the controller_manager with the rest of your controllers, e.g.:
+#
+# controller_manager:
+#   ros__parameters:
+#     update_rate: 200
+#     wheel_smc:
+#       type: wheel_smc_controller/WheelSmcController
+#
+# wheel_smc:
+#   ros__parameters: !include wheel_smc_params.yaml
+#
+# Values below match Lee & Li 2014 Table 1 (paper) for sanity. Override
+# wheel_x/wheel_y, mass_total, inertia_total etc. with YOUR robot's values.
+
+wheel_smc:
+  ros__parameters:
+    # Joint names — order matters: wheel i must correspond to (wheel_x[i], wheel_y[i])
+    drive_joints:
+      - FR_wheel
+      - FL_wheel
+      - RL_wheel
+      - RR_wheel
+
+    steer_joints:
+      - FR_wheel_steer
+      - FL_wheel_steer
+      - RL_wheel_steer
+      - RR_wheel_steer
+
+    # Wheel positions in robot frame (a = b = 0.1125 m, square footprint)
+    # Indexing per Lee & Li Fig. 2: w1=(+a,+b), w2=(-a,+b), w3=(-a,-b), w4=(+a,-b)
+    wheel_x: [ 0.1125, -0.1125, -0.1125,  0.1125]
+    wheel_y: [ 0.1125,  0.1125, -0.1125, -0.1125]
+
+    # Dynamics — from Caran et al. 2026 Table I
+    mass_total:      3.50      # m = mb + 4*mw  (paper's m, includes wheels)
+    inertia_total:   0.0365    # I = Iθ + 4*mw*(a²+b²)  (paper's I)
+    wheel_inertia:   1.03e-5   # Iφ
+    wheel_radius:    0.0254    # r
+
+    # SMC gains — tuned to be in the same ballpark as your PI baseline
+    # (PI per-wheel: P=0.03, I=0.1 in your YAML).
+    # The SMC λ plays the role of integral-time constant on the sliding surface;
+    # K_switch is the switching gain (must dominate disturbance bound).
+    # Start conservative and raise K_switch if you see steady-state error.
+    lambda:   [3.0, 3.0, 3.0, 3.0]    # ~ I/P ratio of your PI (0.1/0.03 ≈ 3.3)
+    k_switch: [0.05, 0.05, 0.05, 0.05]  # scaled to small wheel inertia (Iφ ~ 1e-5)
+
+    boundary_layer: 0.02      # tighter than default; small Iφ → less chattering risk
+    torque_limit:   0.5       # Dynamixel XH430-W210 stall ≈ 4.1 Nm; conservative limit
+    regularization: 1.0e-6
+
+    velocity_reference_topic: "~/velocity_reference"
+    odom_topic:               "/odom"
+    use_odom_for_omega:       false   # currently unused: theta_dot is plumbed
+                                       # but build_dynamics() doesn't consume it
+                                       # (heading cancels under common-shift).
+                                       # Kept for future extensions.

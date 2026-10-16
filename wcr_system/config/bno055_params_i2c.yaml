@@ -1,0 +1,28 @@
+
+# Example parameters for an I2C connection to the BNO055 motion sensor.
+bno055:
+  ros__parameters:
+    ros_topic_prefix: "bno055/"
+    connection_type: "i2c"
+    i2c_bus: 8
+    i2c_addr: 0x28
+    data_query_frequency: 100
+    calib_status_frequency: 10.0
+    frame_id: "imu_link"
+    operation_mode: 0x0C
+    placement_axis_remap: "P0"
+    acc_factor: 1000.0
+    mag_factor: 740.0
+    gyr_factor: 708.0
+    grav_factor: 100.0
+    set_offsets: true # set to true to use offsets below
+    offset_acc: [0x60, 0x13, 0xFFED]
+    offset_mag: [0xFF93, 0x73, 0xFE88]
+    offset_gyr: [0x1, 0xFFFF, 0x0]
+    ## Sensor standard deviation [x,y,z]
+    ## Used to calculate covariance matrices
+    ## defaults are used if parameters below are not provided
+    variance_acc: [0.017, 0.017, 0.017] # [m/s^2]
+    variance_angular_vel: [0.04, 0.04, 0.04] # [rad/s]
+    variance_orientation: [0.0159, 0.0159, 0.0159] # [rad]
+    variance_mag: [0.0, 0.0, 0.0] # [Tesla]
