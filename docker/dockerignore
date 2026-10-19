@@ -1,0 +1,4 @@
+# Don't send the workspaces (build/, install/, log/, bags...) to the Docker daemon.
+# The Dockerfile only needs entrypoint.sh from this folder.
+*
+!entrypoint.sh
